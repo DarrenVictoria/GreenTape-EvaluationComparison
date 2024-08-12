@@ -1,0 +1,19 @@
+<!-- evaluation-comparison-tabs.component.html -->
+<div class="evaluation-comparison-tabs">
+  <div class="tabs">
+    <button *ngFor="let tab of tabs; let i = index" (click)="setActiveTab(i)" [class.active]="activeTab === i">
+      {{ tab.title }}
+    </button>
+  </div>
+
+  <div class="tab-content">
+    <ng-container [ngSwitch]="activeTab">
+      <app-bid-comparison-table *ngSwitchCase="0"></app-bid-comparison-table>
+      <app-placeholder *ngSwitchDefault></app-placeholder>
+    </ng-container>
+  </div>
+
+  <div class="export-all">
+    <button (click)="exportAllToExcel()">Export All to Excel</button>
+  </div>
+</div>
