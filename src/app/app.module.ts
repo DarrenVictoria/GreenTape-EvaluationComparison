@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { EvaluationComparisonTabsComponent } from './evaluation-comparison-tabs/evaluation-comparison-tabs.component';
 import { PlaceholderComponent } from './placeholder/placeholder.component';
 import { BidComparisonTableComponent } from './bid-comparison-table/bid-comparison-table.component';
+import { ShortlistCommitteeComponent } from './shortlist-committee/shortlist-committee.component';
 
 
 const routes: Routes = [
@@ -23,6 +24,7 @@ const routes: Routes = [
     EvaluationComparisonTabsComponent,
     PlaceholderComponent,
     BidComparisonTableComponent,
+    ShortlistCommitteeComponent,
 
 
 

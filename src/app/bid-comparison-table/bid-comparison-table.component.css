@@ -7,7 +7,7 @@
 
 h2,
 h3 {
-    text-align: center;
+    text-align: left;
     margin-bottom: 20px;
 }
 
@@ -53,4 +53,16 @@ h3 {
 
 button:hover {
     background-color: #45a049;
+}
+
+.header-clean {
+    border: none !important;
+    background-color: transparent !important;
+}
+
+/* Add this new style */
+.lowest-price {
+    background-color: #9CFF9C;
+    /* Light green background */
+    font-weight: bold;
 }

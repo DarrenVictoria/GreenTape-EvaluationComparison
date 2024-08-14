@@ -15,36 +15,71 @@
     <p><strong>Completed Date:</strong> {{ bidData.tenderDetails.completedDate }}</p>
   </div>
 
+  <h2>General Questions</h2>
   <table>
     <thead>
       <tr>
-        <th>General Questions</th>
+        <th class="header-clean"></th>
+        <th>Question</th>
         <th *ngFor="let company of bidData.companies">{{ company }}</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let data of bidData.generalQuestions">
-        <td>{{ data.question }}</td>
-        <td *ngFor="let answer of data.answers">{{ answer }}</td>
-      </tr>
+      <ng-container *ngFor="let section of bidData.generalQuestions">
+        <tr *ngFor="let question of section.questions; let i = index">
+          <td *ngIf="i === 0" [attr.rowspan]="section.questions.length" [style.background-color]="'#e0e0e0'">{{
+            section.name }}</td>
+          <td>{{ question.question }}</td>
+          <td *ngFor="let answer of question.answers">{{ answer }}</td>
+        </tr>
+      </ng-container>
     </tbody>
   </table>
 
   <div *ngFor="let category of bidData.productQuestions">
-    <h3>{{ category.category }}</h3>
+    <h2>{{ category.category }}</h2>
     <table>
       <thead>
         <tr>
+          <th class="header-clean"></th>
           <th>Question</th>
           <th *ngFor="let company of bidData.companies">{{ company }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of category.items">
-          <td>{{ item.question }}</td>
-          <td *ngFor="let answer of item.answers">{{ answer }}</td>
-        </tr>
+        <ng-container *ngFor="let section of category.sections">
+          <tr *ngFor="let question of section.questions; let i = index">
+            <td *ngIf="i === 0" [attr.rowspan]="section.questions.length" [style.background-color]="'#e0e0e0'">
+              {{ section.name }}
+            </td>
+            <td>{{ question.question }}</td>
+            <td *ngFor="let answer of question.answers"
+              [ngClass]="{'lowest-price': section.name === 'Pricing' && isLowestPrice(answer, question.answers)}">
+              {{ answer }}
+            </td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>
+
+  <h2>Total Quoted</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="header-clean"></th>
+        <th></th>
+        <th *ngFor="let company of bidData.companies">{{ company }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="background-color: #e0e0e0;">Comparison</td>
+        <td>Total Quoted</td>
+        <td *ngFor="let total of companyTotals" [ngClass]="{'lowest-price': isLowestPrice(total, companyTotals)}">
+          {{ total | number:'1.0-0' }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
