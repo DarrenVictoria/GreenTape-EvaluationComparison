@@ -1,0 +1,153 @@
+<div class="preaward-committee-container">
+  <div class="tender-details">
+    <!-- Tender details section remains unchanged -->
+  </div>
+
+  <h2>Shortlisted Suppliers</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Question</th>
+        <th colspan="3" *ngFor="let company of shortlistedproducts.products[0].companies">{{ company.name }}</th>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Number of Members Shortlisted</td>
+        <td colspan="3" *ngFor="let company of shortlistedproducts.products[0].companies">
+          {{ company.shortlistedMembers }}
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let product of shortlistedproducts.products">
+        <tr>
+          <td colspan="2"><strong>{{ product.name }}</strong></td>
+          <td colspan="3" *ngFor="let company of product.companies"></td>
+        </tr>
+        <ng-container *ngFor="let question of product.generalQuestions">
+          <tr>
+            <td>{{ question.category }}</td>
+            <td>{{ question.question }}</td>
+            <td
+              [ngClass]="{'lowest-price': company.isLowestPrice && question.question === 'Total price for this product/service'}"
+              colspan="3" *ngFor="let company of product.companies">
+              {{ company.answers[question.question] }}
+            </td>
+          </tr>
+        </ng-container>
+        <tr>
+          <td colspan="2">Committee Member</td>
+          <ng-container *ngFor="let company of product.companies">
+            <ng-container *ngFor="let member of company.committeeMembers; let i = index">
+              <td>{{ member?.name }} ({{ member?.role }})</td>
+            </ng-container>
+          </ng-container>
+        </tr>
+        <tr>
+          <td colspan="2">Comment</td>
+          <ng-container *ngFor="let company of product.companies">
+            <ng-container *ngFor="let member of company.committeeMembers; let i = index">
+              <td>{{ member?.comment }}</td>
+            </ng-container>
+          </ng-container>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+
+  <h2>Rejected Suppliers</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Question</th>
+        <th colspan="3" *ngFor="let company of rejectproducts.products[0].companies">{{ company.name }}</th>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Number of Members Shortlisted</td>
+        <td colspan="3" *ngFor="let company of rejectproducts.products[0].companies">
+          {{ company.shortlistedMembers }}
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let product of rejectproducts.products">
+        <tr>
+          <td colspan="2"><strong>{{ product.name }}</strong></td>
+          <td colspan="3" *ngFor="let company of product.companies"></td>
+        </tr>
+        <ng-container *ngFor="let question of product.generalQuestions">
+          <tr>
+            <td>{{ question.category }}</td>
+            <td>{{ question.question }}</td>
+            <td
+              [ngClass]="{'lowest-price': company.isLowestPrice && question.question === 'Total price for this product/service'}"
+              colspan="3" *ngFor="let company of product.companies">
+              {{ company.answers[question.question] }}
+            </td>
+          </tr>
+        </ng-container>
+        <tr>
+          <td colspan="2">Committee Member</td>
+          <ng-container *ngFor="let company of product.companies">
+            <ng-container *ngFor="let member of company.committeeMembers; let i = index">
+              <td>{{ member?.name }} ({{ member?.role }})</td>
+            </ng-container>
+          </ng-container>
+        </tr>
+        <tr>
+          <td colspan="2">Comment</td>
+          <ng-container *ngFor="let company of product.companies">
+            <ng-container *ngFor="let member of company.committeeMembers; let i = index">
+              <td>{{ member?.comment }}</td>
+            </ng-container>
+          </ng-container>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+
+  <!-- Lowest Price Quoted -->
+  <h2>Lowest Price Quoted</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="background-color: green; color: white;">Product</th>
+        <th style="background-color: green; color: white;">Supplier</th>
+        <th style="background-color: green; color: white;">Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of lowestPriceQuoted">
+        <td>{{ row.product }}</td>
+        <td>{{ row.supplier }}</td>
+        <td>{{ row.price}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Amended Product Quantities -->
+  <h2>Amended Product Quantities</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="background-color: green; color: white;">Product</th>
+        <th style="background-color: green; color: white;">Initial Quantity</th>
+        <th style="background-color: green; color: white;">Amended Quantity</th>
+        <th style="background-color: green; color: white;">Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of amendedProductQuantities">
+        <td>{{ row.product }}</td>
+        <td>{{ row.initialQuantity }}</td>
+        <td>{{ row.amendedQuantity }}</td>
+        <td>{{ row.remarks }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+</div>
