@@ -1,0 +1,166 @@
+.score-sheet-container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+}
+
+.main-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.main-table th,
+.main-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.section-row {
+    display: table-row;
+}
+
+.questions-column,
+.weights-column,
+.answers-column,
+.scores-column {
+    padding: 0;
+}
+
+.question-row {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    /* Adjust this value as needed */
+    padding: 4px 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.question-row:last-child {
+    border-bottom: none;
+}
+
+.question-text,
+.weight-text,
+.answer-text,
+.score-text {
+    display: block;
+    width: 100%;
+    font-size: 0.75rem;
+}
+
+.nested-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.nested-table td {
+    border: 1px solid #ddd;
+    padding: 2px;
+    min-height: 50px;
+    /* Adjust this value as needed */
+    height: 100%;
+}
+
+.tender-details p {
+    margin: 0.45rem;
+}
+
+.tender-details {
+    margin-bottom: 3rem;
+}
+
+.nested-table-row {
+    display: contents;
+}
+
+.nested-table-cell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-column {
+    width: 30px;
+    background-color: #f0f0f0;
+    padding: 0;
+    position: relative;
+}
+
+.toggle-bar {
+    width: 100%;
+    height: 100%;
+    background-color: #4CAF50;
+    transition: background-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toggle-bar.expanded {
+    background-color: #45a049;
+}
+
+.supplier-name {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    white-space: nowrap;
+    color: white;
+    font-weight: bold;
+    transform: rotate(180deg);
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.supplier-score {
+    transform: rotate(90deg);
+    font-size: 11px;
+    margin-bottom: 1rem;
+    color: white;
+
+}
+
+.info-button,
+.toggle-button {
+    background-color: white;
+    border: none;
+    color: #4CAF50;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.info-button {
+    margin-top: 5px;
+}
+
+.toggle-button {
+    margin-bottom: 5px;
+}
+
+.expanded .toggle-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.fas {
+    pointer-events: none;
+}
+
+ul {
+    margin: 0;
+    padding-left: 20px;
+}

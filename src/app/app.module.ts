@@ -8,7 +8,7 @@ import { EvaluationComparisonTabsComponent } from './evaluation-comparison-tabs/
 import { PlaceholderComponent } from './placeholder/placeholder.component';
 import { BidComparisonTableComponent } from './bid-comparison-table/bid-comparison-table.component';
 import { ShortlistCommitteeComponent } from './shortlist-committee/shortlist-committee.component';
-import { PreawardCommitteeComponent } from './preaward-committee/preaward-committee.component';
+import { AwarderComponent } from './awarder/awarder.component';
 import { ScoreSheetComponent } from './score-sheet/score-sheet.component';
 
 
@@ -27,7 +27,7 @@ const routes: Routes = [
     PlaceholderComponent,
     BidComparisonTableComponent,
     ShortlistCommitteeComponent,
-    PreawardCommitteeComponent,
+    AwarderComponent,
     ScoreSheetComponent,
 
 

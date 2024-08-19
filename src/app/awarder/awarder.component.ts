@@ -19,11 +19,11 @@ interface Company {
 
 
 @Component({
-  selector: 'app-preaward-committee',
-  templateUrl: './preaward-committee.component.html',
-  styleUrls: ['./preaward-committee.component.css']
+  selector: 'app-awarder',
+  templateUrl: './awarder.component.html',
+  styleUrls: ['./awarder.component.css']
 })
-export class PreawardCommitteeComponent implements OnInit {
+export class AwarderComponent implements OnInit {
   companyTotals: number[];
   companyAvgScores: number[];
 
@@ -475,8 +475,6 @@ export class PreawardCommitteeComponent implements OnInit {
     // Add more products as needed
   ];
 
-
-
   constructor() { }
 
   ngOnInit() {
@@ -735,13 +733,14 @@ export class PreawardCommitteeComponent implements OnInit {
       const productHeaderRow = worksheet.addRow([
         '',
         product.name,
-        ...product.companies.reduce((acc, c) => acc.concat([c.name, '', '']), [])
+        ...product.companies.reduce((acc, c) => acc.concat([c.name, c.name, c.name]), [])
       ]);
       this.styleHeaderRow(productHeaderRow);
       product.companies.forEach((_, index) => {
-        worksheet.mergeCells(startRow, index * 3 + 3, startRow, index * 3 + 5);
+        worksheet.mergeCells(productHeaderRow.number, index * 3 + 3, productHeaderRow.number, index * 3 + 5);
+        const mergedCell = worksheet.getCell(productHeaderRow.number, index * 3 + 3);
+        mergedCell.alignment = { horizontal: 'center', vertical: 'middle' };
       });
-      startRow++;
 
       // Rejected members
       const rejectedRow = worksheet.addRow([
@@ -793,6 +792,9 @@ export class PreawardCommitteeComponent implements OnInit {
         ]);
         row.getCell(2).font = { bold: true };
       });
+
+      // Add an empty row between products
+      worksheet.addRow([]);
     });
 
     this.applyTableStyling(worksheet, startRow, worksheet.rowCount);

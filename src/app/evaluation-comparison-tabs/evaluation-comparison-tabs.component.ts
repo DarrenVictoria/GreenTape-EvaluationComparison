@@ -3,7 +3,8 @@ import * as ExcelJS from 'exceljs';
 import * as FileSaver from 'file-saver';
 import { BidComparisonTableComponent } from '../bid-comparison-table/bid-comparison-table.component';
 import { ShortlistCommitteeComponent } from '../shortlist-committee/shortlist-committee.component';
-import { PreawardCommitteeComponent } from '../preaward-committee/preaward-committee.component';
+import { AwarderComponent } from '../awarder/awarder.component';
+import { ScoreSheetComponent } from '../score-sheet/score-sheet.component';
 
 @Component({
   selector: 'app-evaluation-comparison-tabs',
@@ -13,7 +14,8 @@ import { PreawardCommitteeComponent } from '../preaward-committee/preaward-commi
 export class EvaluationComparisonTabsComponent {
   @ViewChild(BidComparisonTableComponent) bidComparisonTableComponent: BidComparisonTableComponent;
   @ViewChild(ShortlistCommitteeComponent) shortlistCommitteeComponent: ShortlistCommitteeComponent;
-  @ViewChild(PreawardCommitteeComponent) preawardCommitteeComponent: PreawardCommitteeComponent;
+  @ViewChild(AwarderComponent) awarderComponent: AwarderComponent;
+  @ViewChild(ScoreSheetComponent) scoreSheetComponent: ScoreSheetComponent;
 
   activeTab: number = 0;
   tabs = [
@@ -21,8 +23,8 @@ export class EvaluationComparisonTabsComponent {
     { title: 'Shortlist Committee 1', component: 'ShortlistCommitteeComponent' },
     { title: 'Shortlist 2 Commitee', component: 'PlaceholderComponent' },
     { title: 'Preaward Commitee', component: 'PlaceholderComponent' },
-    { title: 'Awarder', component: 'PreawardCommitteeComponent' },
-    { title: 'Score Sheet ', component: 'PlaceholderComponent' }
+    { title: 'Awarder', component: 'AwarderComponent' },
+    { title: 'Score Sheet ', component: 'ScoreSheetComponent' }
   ];
 
   constructor() { }
@@ -30,7 +32,7 @@ export class EvaluationComparisonTabsComponent {
   ngAfterViewInit() {
     console.log('Bid Comparison Component:', this.bidComparisonTableComponent);
     console.log('Shortlist Committee Component:', this.shortlistCommitteeComponent);
-    console.log('Award Committee Component:', this.preawardCommitteeComponent);
+    console.log('Award Committee Component:', this.awarderComponent);
   }
 
   setActiveTab(index: number) {
@@ -147,10 +149,10 @@ export class EvaluationComparisonTabsComponent {
 
     // Export PreAward (Awarder) tab
     console.log('Attempting to export PreAward (Awarder)');
-    if (this.preawardCommitteeComponent) {
+    if (this.awarderComponent) {
       console.log('PreAward Committee component found');
       try {
-        const preawardCommitteeWorksheet = await this.preawardCommitteeComponent.getWorksheet();
+        const preawardCommitteeWorksheet = await this.awarderComponent.getWorksheet();
         console.log('PreAward Committee worksheet obtained');
         this.copyWorksheet(preawardCommitteeWorksheet, workbook, 'Awarder');
         console.log('PreAward Committee worksheet copied to workbook');
@@ -159,6 +161,22 @@ export class EvaluationComparisonTabsComponent {
       }
     } else {
       console.log('PreAward Committee component not found');
+    }
+
+    // Export Score Sheet tab
+    console.log('Attempting to export Score Sheet');
+    if (this.scoreSheetComponent) {
+      console.log('Score Sheet component found');
+      try {
+        const scoreSheetWorksheet = await this.scoreSheetComponent.getWorksheet();
+        console.log('Score Sheet worksheet obtained');
+        this.copyWorksheet(scoreSheetWorksheet, workbook, 'Score Sheet');
+        console.log('Score Sheet worksheet copied to workbook');
+      } catch (error) {
+        console.error('Error exporting Score Sheet:', error);
+      }
+    } else {
+      console.log('Score Sheet component not found');
     }
 
     // Generate and save the Excel file

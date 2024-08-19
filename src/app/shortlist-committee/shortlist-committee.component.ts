@@ -366,6 +366,7 @@ export class ShortlistCommitteeComponent implements OnInit {
     this.highlightLowestPrice();
   }
 
+
   calculateCompanyTotals() {
     this.companyTotals = this.bidData.companies.map(company => {
       return this.products.products.reduce((total, product) => {

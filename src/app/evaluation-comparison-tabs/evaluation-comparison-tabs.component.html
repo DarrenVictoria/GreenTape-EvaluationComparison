@@ -9,9 +9,10 @@
   <div class="tab-content">
     <app-bid-comparison-table [style.display]="activeTab === 0 ? 'block' : 'none'"></app-bid-comparison-table>
     <app-shortlist-committee [style.display]="activeTab === 1 ? 'block' : 'none'"></app-shortlist-committee>
-    <app-preaward-committee [style.display]="activeTab === 4 ? 'block' : 'none'"></app-preaward-committee>
-    <app-placeholder *ngFor="let tab of [tabs[2], tabs[3], tabs[5]]; let i = index"
-      [style.display]="activeTab === i + 2 || activeTab === 5 ? 'block' : 'none'"></app-placeholder>
+    <app-awarder [style.display]="activeTab === 4 ? 'block' : 'none'"></app-awarder>
+    <app-score-sheet [style.display]="activeTab === 5 ? 'block' : 'none'"></app-score-sheet>
+    <app-placeholder *ngFor="let tab of [tabs[2], tabs[3]]; let i = index"
+      [style.display]="activeTab === i + 2 ? 'block' : 'none'"></app-placeholder>
   </div>
 
   <div class="export-all">

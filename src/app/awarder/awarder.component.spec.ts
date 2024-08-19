@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PreawardCommitteeComponent } from './preaward-committee.component';
+import { PreawardCommitteeComponent } from './awarder.component';
 
 describe('PreawardCommitteeComponent', () => {
   let component: PreawardCommitteeComponent;
@@ -8,9 +8,9 @@ describe('PreawardCommitteeComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PreawardCommitteeComponent ]
+      declarations: [PreawardCommitteeComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
