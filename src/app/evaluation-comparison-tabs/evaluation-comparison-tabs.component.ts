@@ -3,6 +3,8 @@ import * as ExcelJS from 'exceljs';
 import * as FileSaver from 'file-saver';
 import { BidComparisonTableComponent } from '../bid-comparison-table/bid-comparison-table.component';
 import { ShortlistCommitteeComponent } from '../shortlist-committee/shortlist-committee.component';
+import { ShortlistCommittee2Component } from '../shortlist-committee-2/shortlist-committee-2.component';
+import { PreawardCommitteeComponent } from '../preaward-committee/preaward-committee.component';
 import { AwarderComponent } from '../awarder/awarder.component';
 import { ScoreSheetComponent } from '../score-sheet/score-sheet.component';
 
@@ -14,6 +16,8 @@ import { ScoreSheetComponent } from '../score-sheet/score-sheet.component';
 export class EvaluationComparisonTabsComponent {
   @ViewChild(BidComparisonTableComponent) bidComparisonTableComponent: BidComparisonTableComponent;
   @ViewChild(ShortlistCommitteeComponent) shortlistCommitteeComponent: ShortlistCommitteeComponent;
+  @ViewChild(ShortlistCommittee2Component) shortlistCommittee2Component: ShortlistCommittee2Component;
+  @ViewChild(PreawardCommitteeComponent) preawardCommitteeComponent: PreawardCommitteeComponent;
   @ViewChild(AwarderComponent) awarderComponent: AwarderComponent;
   @ViewChild(ScoreSheetComponent) scoreSheetComponent: ScoreSheetComponent;
 
@@ -21,10 +25,10 @@ export class EvaluationComparisonTabsComponent {
   tabs = [
     { title: 'Bid Comparison', component: 'BidComparisonTableComponent' },
     { title: 'Shortlist Committee 1', component: 'ShortlistCommitteeComponent' },
-    { title: 'Shortlist 2 Commitee', component: 'PlaceholderComponent' },
-    { title: 'Preaward Commitee', component: 'PlaceholderComponent' },
+    { title: 'Shortlist Committee 2', component: 'ShortlistCommittee2Component' },
+    { title: 'Preaward Committee', component: 'PreawardCommitteeComponent' },
     { title: 'Awarder', component: 'AwarderComponent' },
-    { title: 'Score Sheet ', component: 'ScoreSheetComponent' }
+    { title: 'Score Sheet', component: 'ScoreSheetComponent' }
   ];
 
   constructor() { }
@@ -32,80 +36,17 @@ export class EvaluationComparisonTabsComponent {
   ngAfterViewInit() {
     console.log('Bid Comparison Component:', this.bidComparisonTableComponent);
     console.log('Shortlist Committee Component:', this.shortlistCommitteeComponent);
+    console.log('Shortlist Committee 2 Component:', this.shortlistCommittee2Component);
+    console.log('Preaward Committee Component:', this.preawardCommitteeComponent);
     console.log('Award Committee Component:', this.awarderComponent);
+    console.log('Score Sheet Component:', this.scoreSheetComponent);
   }
 
   setActiveTab(index: number) {
     this.activeTab = index;
   }
 
-  // async exportAllToExcel() {
-  //   const workbook = new ExcelJS.Workbook();
-
-  //   // Export the Bid Comparison tab
-  //   if (this.bidComparisonTableComponent) {
-  //     const worksheet = await this.bidComparisonTableComponent.getWorksheet();
-  //     const newWorksheet = workbook.addWorksheet('Bid Comparison');
-
-  //     // Copy styles and column widths
-  //     worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-  //       const newRow = newWorksheet.getRow(rowNumber);
-  //       row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-  //         const newCell = newRow.getCell(colNumber);
-  //         newCell.value = cell.value;
-  //         newCell.style = JSON.parse(JSON.stringify(cell.style)); // Deep copy of style
-  //       });
-  //       newRow.height = row.height;
-  //     });
-
-  //     // Copy column widths
-  //     worksheet.columns.forEach((col: any, index: number) => {
-  //       if (col.width) {
-  //         newWorksheet.getColumn(index + 1).width = col.width;
-  //       }
-  //     });
-
-  //     // Highlight lowest prices and total quoted values
-  //     this.highlightLowestPrices(newWorksheet);
-  //     this.highlightLowestTotalQuoted(newWorksheet);
-  //   }
-
-  //   // Optionally export other tabs
-  //   // ...
-
-  //   workbook.xlsx.writeBuffer().then((buffer: ArrayBuffer) => {
-  //     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  //     FileSaver.saveAs(blob, 'EvaluationComparison.xlsx');
-  //   });
-  // }
-
-  // async exportAllToExcel() {
-  //   const workbook = new ExcelJS.Workbook();
-
-  //   // Export the Bid Comparison tab
-  //   if (this.bidComparisonTableComponent) {
-  //     const bidComparisonWorksheet = await this.bidComparisonTableComponent.getWorksheet();
-  //     this.copyWorksheet(bidComparisonWorksheet, workbook, 'Bid Comparison');
-
-  //     // Apply additional formatting (if needed)
-  //     const newWorksheet = workbook.getWorksheet('Bid Comparison');
-  //     this.highlightLowestPrices(newWorksheet);
-  //     this.highlightLowestTotalQuoted(newWorksheet);
-  //   }
-
-  //   // Export the Shortlist Committee tab
-  //   if (this.shortlistCommitteeComponent) {
-  //     const shortlistCommitteeWorksheet = await this.shortlistCommitteeComponent.getWorksheet();
-  //     this.copyWorksheet(shortlistCommitteeWorksheet, workbook, 'Shortlist Committee');
-  //   }
-
-  //   // Generate and save the Excel file
-  //   const buffer = await workbook.xlsx.writeBuffer();
-  //   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  //   FileSaver.saveAs(blob, 'EvaluationComparison.xlsx');
-  // }S
-
-  async exportBidComparisonAndShortlistToExcel() {
+  async exportToExcel() {
     console.log('Starting export process');
     const workbook = new ExcelJS.Workbook();
 
@@ -145,6 +86,38 @@ export class EvaluationComparisonTabsComponent {
       }
     } else {
       console.log('Shortlist Committee component not found');
+    }
+
+    // Export Shortlist Committee 2 tab
+    console.log('Attempting to export Shortlist Committee 2');
+    if (this.shortlistCommittee2Component) {
+      console.log('Shortlist Committee 2 component found');
+      try {
+        const shortlistCommittee2Worksheet = await this.shortlistCommittee2Component.getWorksheet();
+        console.log('Shortlist Committee 2 worksheet obtained');
+        this.copyWorksheet(shortlistCommittee2Worksheet, workbook, 'Shortlist Committee 2');
+        console.log('Shortlist Committee 2 worksheet copied to workbook');
+      } catch (error) {
+        console.error('Error exporting Shortlist Committee 2:', error);
+      }
+    } else {
+      console.log('Shortlist Committee 2 component not found');
+    }
+
+    // Export Preaward Committee tab
+    console.log('Attempting to export Preaward Committee');
+    if (this.preawardCommitteeComponent) {
+      console.log('Preaward Committee component found');
+      try {
+        const preawardCommitteeWorksheet = await this.preawardCommitteeComponent.getWorksheet();
+        console.log('Preaward Committee worksheet obtained');
+        this.copyWorksheet(preawardCommitteeWorksheet, workbook, 'Preaward Committee');
+        console.log('Preaward Committee worksheet copied to workbook');
+      } catch (error) {
+        console.error('Error exporting Preaward Committee:', error);
+      }
+    } else {
+      console.log('Preaward Committee component not found');
     }
 
     // Export PreAward (Awarder) tab

@@ -10,6 +10,8 @@ import { BidComparisonTableComponent } from './bid-comparison-table/bid-comparis
 import { ShortlistCommitteeComponent } from './shortlist-committee/shortlist-committee.component';
 import { AwarderComponent } from './awarder/awarder.component';
 import { ScoreSheetComponent } from './score-sheet/score-sheet.component';
+import { PreawardCommitteeComponent } from './preaward-committee/preaward-committee.component';
+import { ShortlistCommittee2Component } from './shortlist-committee-2/shortlist-committee-2.component';
 
 
 const routes: Routes = [
@@ -29,6 +31,8 @@ const routes: Routes = [
     ShortlistCommitteeComponent,
     AwarderComponent,
     ScoreSheetComponent,
+    PreawardCommitteeComponent,
+    ShortlistCommittee2Component,
 
 
 
