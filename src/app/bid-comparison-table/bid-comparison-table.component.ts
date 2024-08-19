@@ -160,8 +160,7 @@ export class BidComparisonTableComponent implements OnInit {
       alignment: { horizontal: 'left', vertical: 'middle' } // Left alignment
     };
 
-    // Add tender details at the top
-    this.addTenderDetails(worksheet, headerStyle, tenderDetailStyle, borderStyle);
+
 
     // Add general questions section
     worksheet.addRow([]);
@@ -194,40 +193,6 @@ export class BidComparisonTableComponent implements OnInit {
     return worksheet;
   }
 
-  private addTenderDetails(worksheet: ExcelJS.Worksheet, headerStyle: Partial<ExcelJS.Style>, tenderDetailStyle: Partial<ExcelJS.Style>, borderStyle: Partial<ExcelJS.Borders>) {
-    const details = this.bidData.tenderDetails;
-    const detailsLayout = [
-      ['Tender ID', details.tenderID],
-      ['Tender Name', details.tenderName],
-      ['Tender Model', details.tenderModel],
-      ['Created By', details.createdBy],
-      ['Created On', details.createdOn],
-      ['Invited Participants', details.invitedParticipants],
-      ['Participated', details.participated],
-      ['Not Submitted', details.notSubmitted],
-      ['Rejected Tender', details.rejectedTender],
-      ['Product Count', details.productCount],
-      ['Committee Members', details.committeeMembers],
-      ['Completed Date', details.completedDate]
-    ];
-
-    detailsLayout.forEach((row) => {
-      const excelRow = worksheet.addRow(row);
-      excelRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-        if (colNumber === 1) {
-          cell.font = tenderDetailStyle.font;
-          cell.fill = tenderDetailStyle.fill;
-          cell.alignment = tenderDetailStyle.alignment;
-        } else {
-          cell.font = { bold: true };
-        }
-        cell.border = borderStyle;
-      });
-    });
-
-    // Add border to the tender details section
-    this.addBorders(worksheet, 1, 1, detailsLayout.length, 2);
-  }
 
   private addGeneralQuestions(worksheet: ExcelJS.Worksheet, headerStyle: Partial<ExcelJS.Style>, borderStyle: Partial<ExcelJS.Borders>) {
     const generalQuestions = this.bidData.generalQuestions;

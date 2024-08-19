@@ -460,8 +460,6 @@ export class ShortlistCommittee2Component implements OnInit {
       worksheet.getColumn(i).width = 42;
     }
 
-    // Add tender details table
-    currentRow = await this.addTenderDetailsTable(worksheet, currentRow);
 
     // Add an empty bordered row
     const emptyRow = worksheet.addRow([]);
@@ -538,35 +536,7 @@ export class ShortlistCommittee2Component implements OnInit {
   }
 
 
-  async addTenderDetailsTable(worksheet: ExcelJS.Worksheet, startRow: number): Promise<number> {
-    const titleRow = worksheet.addRow(['Tender Details']);
-    titleRow.font = { bold: true, size: 16 };
-    titleRow.alignment = { horizontal: 'center' };
 
-    startRow++;
-
-    Object.entries(this.bidData.tenderDetails).forEach(([key, value]) => {
-      const row = worksheet.addRow([key, value]);
-
-      // Style the first cell (key) like the table headers
-      const firstCell = row.getCell(1);
-      firstCell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FF00B050' } // Green color
-      };
-      firstCell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
-      firstCell.alignment = { vertical: 'middle' };
-
-      // Style the second cell (value)
-      const secondCell = row.getCell(2);
-      secondCell.alignment = { vertical: 'middle' };
-    });
-
-    this.applyTableStyling(worksheet, startRow - 1, worksheet.rowCount);
-
-    return worksheet.rowCount + 2; // Return the next available row
-  }
 
   async addGeneralQuestionsTable(worksheet: ExcelJS.Worksheet, startRow: number): Promise<number> {
     const titleRow = worksheet.addRow(['', 'General Questions']);

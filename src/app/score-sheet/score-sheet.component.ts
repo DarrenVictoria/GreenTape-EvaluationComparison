@@ -742,45 +742,8 @@ export class ScoreSheetComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async addTenderDetailsTable(worksheet: ExcelJS.Worksheet, startRow: number): Promise<number> {
-    const titleRow = worksheet.addRow(['Tender Details']);
-    titleRow.font = { bold: true, size: 16 };
-    titleRow.alignment = { horizontal: 'center' };
 
-    startRow++;
 
-    Object.entries(this.bidData.tenderDetails).forEach(([key, value]) => {
-      const row = worksheet.addRow([key, value]);
-
-      // Style the first cell (key) like the table headers
-      const firstCell = row.getCell(1);
-      firstCell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FF00B050' } // Green color
-      };
-      firstCell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
-      firstCell.alignment = { vertical: 'middle' };
-
-      // Style the second cell (value)
-      const secondCell = row.getCell(2);
-      secondCell.alignment = { vertical: 'middle' };
-    });
-
-    this.applyTableStyling(worksheet, startRow - 1, worksheet.rowCount);
-
-    // Add an empty row
-    worksheet.addRow([]);
-
-    // Add Shortlist Committee and Score Range rows
-    this.committeeScoreRanges.forEach(range => {
-      worksheet.addRow([`Shortlist Committee ${range.committee}`]);
-      worksheet.addRow([`Score Range is ${range.start} - ${range.end}`]);
-      worksheet.addRow([]); // Empty row for spacing
-    });
-
-    return worksheet.rowCount + 2; // Return the next available row
-  }
 
   async getWorksheet(): Promise<ExcelJS.Worksheet> {
     const workbook = new ExcelJS.Workbook();
@@ -807,12 +770,9 @@ export class ScoreSheetComponent implements OnInit, AfterViewInit {
       );
     });
 
-    // Add tender details table
-    let currentRow = await this.addTenderDetailsTable(worksheet, 1);
 
-    // Add an empty row
-    worksheet.addRow([]);
-    currentRow++;
+
+
 
     // Add header row
     const headerRow = worksheet.addRow([
