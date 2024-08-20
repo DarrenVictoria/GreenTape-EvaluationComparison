@@ -43,10 +43,11 @@
         <td colspan="2">Committee Member</td>
         <ng-container *ngFor="let company of bidData.companies">
           <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-            <td>{{ member?.name }}</td>
+            <td>{{ member?.name }} ({{ member?.role }})</td>
           </ng-container>
         </ng-container>
       </tr>
+
       <tr>
         <td colspan="2">Score</td>
         <ng-container *ngFor="let company of bidData.companies">
@@ -113,10 +114,11 @@
           <td colspan="2">Committee Member</td>
           <ng-container *ngFor="let company of product.companies">
             <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-              <td>{{ member?.name }}</td>
+              <td>{{ member?.name }} ({{ member?.role }})</td>
             </ng-container>
           </ng-container>
         </tr>
+
         <tr>
           <td colspan="2">Score</td>
           <ng-container *ngFor="let company of product.companies">
@@ -175,11 +177,5 @@
       </tr>
     </tbody>
   </table>
-
-
-
-
-
-
 
 </div>

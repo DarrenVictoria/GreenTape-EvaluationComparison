@@ -74,8 +74,8 @@ export class PreawardCommitteeComponent implements OnInit {
           },
           {
             "name": "Daniel Perera",
-            "role": "Member",
-            "score": "75%",
+            "role": "Nominee",
+            "score": "Not Applicable",
             "comment": "Good warranty terms, but higher pricing.",
             "shortlisted": "YES"
           }
@@ -106,8 +106,8 @@ export class PreawardCommitteeComponent implements OnInit {
           },
           {
             "name": "Daniel Perera",
-            "role": "Member",
-            "score": "60%",
+            "role": "Nominee",
+            "score": "Not Applicable",
             "comment": "New company with less experience.",
             "shortlisted": "NO"
           }
@@ -138,8 +138,8 @@ export class PreawardCommitteeComponent implements OnInit {
           },
           {
             "name": "Daniel Perera",
-            "role": "Member",
-            "score": "60%",
+            "role": "Nominee",
+            "score": "Not Applicable",
             "comment": "New company with less experience.",
             "shortlisted": "NO"
           }
@@ -377,16 +377,22 @@ export class PreawardCommitteeComponent implements OnInit {
   }
 
   calculateCompanyAvgScores() {
-    this.companyAvgScores = this.bidData.companies.map(company => {
-      const scores = company.committeeMembers
-        .map(member => {
-          const score = parseFloat(member.score);
-          return isNaN(score) ? 0 : score;
-        })
-        .filter(score => score > 0);
-      return scores.length > 0 ? scores.reduce((a, b) => a + b) / scores.length : 0;
-    });
+    this.companyAvgScores = this.products.products.map(product => {
+      return product.companies.map(company => {
+        const scores = company.committeeMembers
+          .map(member => {
+            const score = parseFloat(member.score);
+            return isNaN(score) ? 0 : score;
+          })
+          .filter(score => score > 0);
+        return scores.length > 0 ? scores.reduce((a, b) => a + b) / scores.length : 0;
+      });
+    }).reduce((acc, productAvgScores) => {
+      return acc.map((sum, idx) => sum + productAvgScores[idx]);
+    }, Array(this.products.products[0].companies.length).fill(0)).map(totalScore => totalScore / this.products.products.length);
   }
+
+
   highlightLowestPrice() {
     this.products.products.forEach(product => {
       let lowestPrice = Infinity;
@@ -459,7 +465,6 @@ export class PreawardCommitteeComponent implements OnInit {
     for (let i = 3; i <= 60; i++) {
       worksheet.getColumn(i).width = 42;
     }
-
 
 
     // Add an empty bordered row
@@ -535,6 +540,8 @@ export class PreawardCommitteeComponent implements OnInit {
       });
     }
   }
+
+
 
 
   async addGeneralQuestionsTable(worksheet: ExcelJS.Worksheet, startRow: number): Promise<number> {
