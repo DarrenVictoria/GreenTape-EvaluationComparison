@@ -15,6 +15,13 @@ interface Company {
   shortlistedMembers: string;
   answers: { [key: string]: string | number };
   committeeMembers: CommitteeMember[];
+  isLowestPrice?: boolean;
+}
+
+interface Product {
+  name: string;
+  generalQuestions: { category: string; question: string }[];
+  companies: Company[];
 }
 
 
@@ -466,13 +473,11 @@ export class AwarderComponent implements OnInit {
   lowestPriceQuoted = [
     { product: 'Traditional Laptops', supplier: 'Office Hub Ltd', price: 15000 },
     { product: 'Water Bottle', supplier: 'Office Hub Ltd', price: 2000 },
-    // Add more products as needed
   ];
 
   amendedProductQuantities = [
     { product: 'Traditional Laptops', initialQuantity: 100, amendedQuantity: 150, remarks: 'Increased due to high demand' },
     { product: 'Water Bottle', initialQuantity: 500, amendedQuantity: 450, remarks: 'Reduced due to budget constraints' },
-    // Add more products as needed
   ];
 
   constructor() { }
@@ -483,37 +488,37 @@ export class AwarderComponent implements OnInit {
   }
 
   highlightLowestPriceShortlisted() {
-    this.shortlistedproducts.products.forEach(product => {
+    this.shortlistedproducts.products.forEach((product: Product) => {
       let lowestPrice = Infinity;
-      let lowestPriceQuestion = "Total price for this product/service";
+      const lowestPriceQuestion = "Total price for this product/service";
 
-      product.companies.forEach(company => {
-        const price = parseFloat(company.answers[lowestPriceQuestion]);
+      product.companies.forEach((company: Company) => {
+        const price = parseFloat(company.answers[lowestPriceQuestion] as string);
         if (price < lowestPrice) {
           lowestPrice = price;
         }
       });
 
-      product.companies.forEach(company => {
-        company.isLowestPrice = parseFloat(company.answers[lowestPriceQuestion]) === lowestPrice;
+      product.companies.forEach((company: Company) => {
+        company.isLowestPrice = parseFloat(company.answers[lowestPriceQuestion] as string) === lowestPrice;
       });
     });
   }
 
   highlightLowestPriceRejected() {
-    this.rejectproducts.products.forEach(product => {
+    this.rejectproducts.products.forEach((product: Product) => {
       let lowestPrice = Infinity;
-      let lowestPriceQuestion = "Total price for this product/service";
+      const lowestPriceQuestion = "Total price for this product/service";
 
-      product.companies.forEach(company => {
-        const price = parseFloat(company.answers[lowestPriceQuestion]);
+      product.companies.forEach((company: Company) => {
+        const price = parseFloat(company.answers[lowestPriceQuestion] as string);
         if (price < lowestPrice) {
           lowestPrice = price;
         }
       });
 
-      product.companies.forEach(company => {
-        company.isLowestPrice = parseFloat(company.answers[lowestPriceQuestion]) === lowestPrice;
+      product.companies.forEach((company: Company) => {
+        company.isLowestPrice = parseFloat(company.answers[lowestPriceQuestion] as string) === lowestPrice;
       });
     });
   }
@@ -522,7 +527,7 @@ export class AwarderComponent implements OnInit {
     for (let i = startRow; i <= endRow; i++) {
       const row = worksheet.getRow(i);
       row.eachCell((cell, colNumber) => {
-        if (colNumber > 1) { // Skip the first column
+        if (colNumber > 1) {
           cell.border = {
             top: { style: 'thin', color: { argb: 'FF006100' } },
             left: { style: 'thin', color: { argb: 'FF006100' } },
@@ -536,11 +541,11 @@ export class AwarderComponent implements OnInit {
 
   styleHeaderRow(row: ExcelJS.Row) {
     row.eachCell((cell, colNumber) => {
-      if (colNumber > 1) {  // Skip the first column
+      if (colNumber > 1) {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: 'FF00B050' } // Green color
+          fgColor: { argb: 'FF00B050' }
         };
         cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
       }
@@ -550,11 +555,11 @@ export class AwarderComponent implements OnInit {
 
   styleAdditionalHeaderRow(row: ExcelJS.Row) {
     row.eachCell((cell, colNumber) => {
-      if (colNumber > 1) {  // Skip the first column
+      if (colNumber > 1) {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: 'FF00B050' } // Green color
+          fgColor: { argb: 'FF00B050' }
         };
         cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
       }
@@ -562,12 +567,11 @@ export class AwarderComponent implements OnInit {
     });
   }
 
-
   styleCategoryCell(cell: ExcelJS.Cell) {
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FFD9D9D9' } // Gray color
+      fgColor: { argb: 'FFD9D9D9' }
     };
     cell.border = {
       top: { style: 'thin', color: { argb: 'FF000000' } },
@@ -585,25 +589,20 @@ export class AwarderComponent implements OnInit {
 
     let currentRow = 1;
 
-    // Set column widths
     worksheet.getColumn(1).width = 20;
     worksheet.getColumn(2).width = 69;
     for (let i = 3; i <= 60; i++) {
       worksheet.getColumn(i).width = 42;
     }
 
-
-    // Add an empty bordered row
     const emptyRow = worksheet.addRow([]);
     this.applyTableStyling(worksheet, currentRow, currentRow);
     currentRow++;
 
-    // Add shortlisted products table
     currentRow = await this.addPreAwardShortlistedSuppliers(worksheet, currentRow);
 
     worksheet.addRow([]);
 
-    // Add rejected products table
     currentRow = await this.addPreAwardRejectedSuppliers(worksheet, currentRow);
 
     worksheet.addRow([]);
@@ -613,8 +612,6 @@ export class AwarderComponent implements OnInit {
     return worksheet;
   }
 
-
-
   async addPreAwardShortlistedSuppliers(worksheet: ExcelJS.Worksheet, startRow: number): Promise<number> {
     const titleRow = worksheet.addRow(['', 'Pre Award Shortlisted Suppliers']);
     titleRow.font = { bold: true, size: 16 };
@@ -622,41 +619,37 @@ export class AwarderComponent implements OnInit {
 
     startRow++;
 
-    this.shortlistedproducts.products.forEach((product, productIndex) => {
-      // Product header
+    this.shortlistedproducts.products.forEach((product: Product, productIndex: number) => {
       const productHeaderRow = worksheet.addRow([
         '',
         product.name,
-        ...product.companies.reduce((acc, c) => acc.concat(['', c.name, '']), [])
+        ...product.companies.reduce((acc: string[], c: Company) => acc.concat(['', c.name, '']), [])
       ]);
       this.styleHeaderRow(productHeaderRow);
-      product.companies.forEach((_, index) => {
+      product.companies.forEach((_, index: number) => {
         worksheet.mergeCells(startRow + productIndex * (product.generalQuestions.length + 5) + 1, index * 3 + 3, startRow + productIndex * (product.generalQuestions.length + 5) + 1, index * 3 + 5);
       });
 
-      // Shortlisted members
       const shortlistedRow = worksheet.addRow([
         '',
         'Product Question ↓',
-        ...product.companies.reduce((acc, c) => acc.concat([c.shortlistedMembers, '', '']), [])
+        ...product.companies.reduce((acc: string[], c: Company) => acc.concat([c.shortlistedMembers, '', '']), [])
       ]);
-      product.companies.forEach((_, index) => {
+      product.companies.forEach((_, index: number) => {
         worksheet.mergeCells(shortlistedRow.number, index * 3 + 3, shortlistedRow.number, index * 3 + 5);
       });
 
-      // Questions
       product.generalQuestions.forEach(question => {
         const row = worksheet.addRow([
           question.category,
           question.question,
-          ...product.companies.reduce((acc, company) => acc.concat([company.answers[question.question], '', '']), [])
+          ...product.companies.reduce((acc: string[], company: Company) => acc.concat([company.answers[question.question] as string, '', '']), [])
         ]);
         this.styleCategoryCell(row.getCell(1));
-        product.companies.forEach((_, index) => {
+        product.companies.forEach((_, index: number) => {
           worksheet.mergeCells(row.number, index * 3 + 3, row.number, index * 3 + 5);
         });
 
-        // Highlight the lowest price if applicable
         if (question.question === 'Total price for this product/service') {
           const prices = product.companies.map(company => parseFloat(company.answers[question.question] as string));
           const lowestPrice = Math.min(...prices);
@@ -665,19 +658,18 @@ export class AwarderComponent implements OnInit {
               cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
-                fgColor: { argb: 'FFD9F3AD' } // Light green fill
+                fgColor: { argb: 'FFD9F3AD' }
               };
             }
           });
         }
       });
 
-      // Committee member details
       ['Committee Member', 'Comment'].forEach(category => {
         const row = worksheet.addRow([
           '',
           category,
-          ...product.companies.reduce((acc, company) =>
+          ...product.companies.reduce((acc: string[], company: Company) =>
             acc.concat(company.committeeMembers.map(member =>
               category === 'Committee Member' ? `${member.name} (${member.role})` : (member[category.toLowerCase()] || '')
             )), [])
@@ -698,43 +690,39 @@ export class AwarderComponent implements OnInit {
 
     startRow++;
 
-    this.rejectproducts.products.forEach((product, productIndex) => {
-      // Product header
+    this.rejectproducts.products.forEach((product: Product, productIndex: number) => {
       const productHeaderRow = worksheet.addRow([
         '',
         product.name,
-        ...product.companies.reduce((acc, c) => acc.concat([c.name, c.name, c.name]), [])
+        ...product.companies.reduce((acc: string[], c: Company) => acc.concat([c.name, c.name, c.name]), [])
       ]);
       this.styleHeaderRow(productHeaderRow);
-      product.companies.forEach((_, index) => {
+      product.companies.forEach((_, index: number) => {
         worksheet.mergeCells(productHeaderRow.number, index * 3 + 3, productHeaderRow.number, index * 3 + 5);
         const mergedCell = worksheet.getCell(productHeaderRow.number, index * 3 + 3);
         mergedCell.alignment = { horizontal: 'center', vertical: 'middle' };
       });
 
-      // Rejected members
       const rejectedRow = worksheet.addRow([
         '',
         'Product Question ↓',
-        ...product.companies.reduce((acc, c) => acc.concat([c.shortlistedMembers, '', '']), [])
+        ...product.companies.reduce((acc: string[], c: Company) => acc.concat([c.shortlistedMembers, '', '']), [])
       ]);
-      product.companies.forEach((_, index) => {
+      product.companies.forEach((_, index: number) => {
         worksheet.mergeCells(rejectedRow.number, index * 3 + 3, rejectedRow.number, index * 3 + 5);
       });
 
-      // Questions
       product.generalQuestions.forEach(question => {
         const row = worksheet.addRow([
           question.category,
           question.question,
-          ...product.companies.reduce((acc, company) => acc.concat([company.answers[question.question], '', '']), [])
+          ...product.companies.reduce((acc: string[], company: Company) => acc.concat([company.answers[question.question] as string, '', '']), [])
         ]);
         this.styleCategoryCell(row.getCell(1));
-        product.companies.forEach((_, index) => {
+        product.companies.forEach((_, index: number) => {
           worksheet.mergeCells(row.number, index * 3 + 3, row.number, index * 3 + 5);
         });
 
-        // Highlight the lowest price if applicable
         if (question.question === 'Total price for this product/service') {
           const prices = product.companies.map(company => parseFloat(company.answers[question.question] as string));
           const lowestPrice = Math.min(...prices);
@@ -743,19 +731,18 @@ export class AwarderComponent implements OnInit {
               cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
-                fgColor: { argb: 'FFD9F3AD' } // Light green fill
+                fgColor: { argb: 'FFD9F3AD' }
               };
             }
           });
         }
       });
 
-      // Committee member details
       ['Committee Member', 'Comment'].forEach(category => {
         const row = worksheet.addRow([
           '',
           category,
-          ...product.companies.reduce((acc, company) =>
+          ...product.companies.reduce((acc: string[], company: Company) =>
             acc.concat(company.committeeMembers.map(member =>
               category === 'Committee Member' ? `${member.name} (${member.role})` : (member[category.toLowerCase()] || '')
             )), [])
@@ -763,7 +750,6 @@ export class AwarderComponent implements OnInit {
         row.getCell(2).font = { bold: true };
       });
 
-      // Add an empty row between products
       worksheet.addRow([]);
     });
 
@@ -800,10 +786,8 @@ export class AwarderComponent implements OnInit {
         startRow++;
       }
 
-      // Apply table styling to the entire table, including headers and data
       this.applyTableStyling(worksheet, startRow - table.data.length, startRow);
 
-      // Add an empty row between tables
       worksheet.addRow([]);
       startRow++;
     }
@@ -819,6 +803,4 @@ export class AwarderComponent implements OnInit {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     FileSaver.saveAs(blob, 'Preaward_Committee_Report.xlsx');
   }
-
-
 }

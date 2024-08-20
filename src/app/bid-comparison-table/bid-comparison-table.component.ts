@@ -32,6 +32,13 @@ interface ProductCategory {
   sections: Section[];
 }
 
+interface BidData {
+  tenderDetails: TenderDetails;
+  companies: string[];
+  generalQuestions: Section[];
+  productQuestions: ProductCategory[];
+}
+
 
 @Component({
   selector: 'app-bid-comparison-table',
@@ -140,11 +147,10 @@ export class BidComparisonTableComponent implements OnInit {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Bid Comparison');
 
-    // Define styles
     const headerStyle: Partial<ExcelJS.Style> = {
       font: { color: { argb: 'FFFFFFFF' }, bold: true },
       fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4CAF50' } },
-      alignment: { horizontal: 'left', vertical: 'middle' } // Left alignment
+      alignment: { horizontal: 'left', vertical: 'middle' }
     };
 
     const borderStyle: Partial<ExcelJS.Borders> = {
@@ -154,128 +160,97 @@ export class BidComparisonTableComponent implements OnInit {
       right: { style: 'thin', color: { argb: 'FF008C72' } }
     };
 
-    const tenderDetailStyle: Partial<ExcelJS.Style> = {
-      font: { color: { argb: 'FFFFFFFF' }, bold: true },
-      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4CAF50' } },
-      alignment: { horizontal: 'left', vertical: 'middle' } // Left alignment
-    };
-
-
-
-    // Add general questions section
     worksheet.addRow([]);
     this.addGeneralQuestions(worksheet, headerStyle, borderStyle);
 
-    // Add product questions section
     worksheet.addRow([]);
     this.addProductQuestions(worksheet, headerStyle, borderStyle);
 
-    // Set column widths
-    worksheet.getColumn(1).width = 26; // Section
-    worksheet.getColumn(2).width = 69; // Question
+    worksheet.getColumn(1).width = 26;
+    worksheet.getColumn(2).width = 69;
 
-    // Adjust widths for company columns
-    const companyStartColumn = 3; // Adjust based on your table layout
+    const companyStartColumn = 3;
     const numCompanyColumns = this.bidData.companies.length;
 
     for (let i = companyStartColumn; i < companyStartColumn + numCompanyColumns; i++) {
-      worksheet.getColumn(i).width = 20; // Width for company columns
+      worksheet.getColumn(i).width = 20;
     }
 
-
-    // Set left alignment for all cells
     worksheet.eachRow({ includeEmpty: true }, (row) => {
       row.eachCell((cell) => {
-        cell.alignment = { horizontal: 'left', vertical: 'middle' }; // Left alignment
+        cell.alignment = { horizontal: 'left', vertical: 'middle' };
       });
     });
 
     return worksheet;
   }
 
-
-  private addGeneralQuestions(worksheet: ExcelJS.Worksheet, headerStyle: Partial<ExcelJS.Style>, borderStyle: Partial<ExcelJS.Borders>) {
-    const generalQuestions = this.bidData.generalQuestions;
-
-    // Add "General Questions" label
+  private addGeneralQuestions(worksheet: ExcelJS.Worksheet, headerStyle: Partial<ExcelJS.Style>, borderStyle: Partial<ExcelJS.Borders>): void {
     const labelRow = worksheet.addRow(['General Questions']);
     labelRow.getCell(1).font = { bold: true, size: 14 };
-    worksheet.addRow([]); // Empty row for spacing
+    worksheet.addRow([]);
 
-    // Add header row
     const headerRow = worksheet.addRow(['', 'Question', ...this.bidData.companies]);
     headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-      if (colNumber > 1) { // Skip the first (empty) cell
-        cell.font = headerStyle.font;
-        cell.fill = headerStyle.fill;
-        cell.alignment = headerStyle.alignment;
+      if (colNumber > 1) {
+        Object.assign(cell, headerStyle);
         cell.border = borderStyle;
       }
     });
 
     let currentSection = '';
     let sectionStartRow = 0;
-    let questionCount = 0;
 
-    generalQuestions.forEach((section, sectionIndex) => {
+    this.bidData.generalQuestions.forEach((section, sectionIndex) => {
       section.questions.forEach((question, questionIndex) => {
         const rowIndex = worksheet.rowCount + 1;
         const row = worksheet.addRow(['', question.question, ...question.answers]);
 
-        // Apply borders and styles to all cells
-        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        row.eachCell({ includeEmpty: true }, (cell) => {
           cell.border = borderStyle;
         });
 
-        // Handle section name and rowspan
         if (section.name !== currentSection) {
           if (currentSection !== '') {
-            // Merge previous section cells
             this.mergeSectionCells(worksheet, sectionStartRow, rowIndex - 1, currentSection);
           }
           currentSection = section.name;
           sectionStartRow = rowIndex;
-          questionCount = 0;
         }
-        questionCount++;
 
-        // If it's the last question of the last section, merge the section cells
-        if (sectionIndex === generalQuestions.length - 1 && questionIndex === section.questions.length - 1) {
+        if (sectionIndex === this.bidData.generalQuestions.length - 1 && questionIndex === section.questions.length - 1) {
           this.mergeSectionCells(worksheet, sectionStartRow, rowIndex, currentSection);
         }
       });
     });
   }
 
-  private async addProductQuestions(worksheet: ExcelJS.Worksheet, headerStyle: Partial<ExcelJS.Style>, borderStyle: Partial<ExcelJS.Borders>) {
+  private addProductQuestions(worksheet: ExcelJS.Worksheet, headerStyle: Partial<ExcelJS.Style>, borderStyle: Partial<ExcelJS.Borders>): void {
     const companyCount = this.bidData.companies.length;
     const companyTotals: number[] = new Array(companyCount).fill(0);
 
     this.bidData.productQuestions.forEach(category => {
       const categoryRow = worksheet.addRow([category.category]);
       categoryRow.getCell(1).font = { bold: true, size: 14 };
-      worksheet.addRow([]); // Empty row for spacing
+      worksheet.addRow([]);
 
       const headerRow = worksheet.addRow(['', 'Question', ...this.bidData.companies]);
       headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-        if (colNumber > 1) { // Skip the first (empty) cell
-          cell.font = headerStyle.font;
-          cell.fill = headerStyle.fill;
-          cell.alignment = headerStyle.alignment;
+        if (colNumber > 1) {
+          Object.assign(cell, headerStyle);
           cell.border = borderStyle;
         }
       });
 
       let currentSection = '';
       let sectionStartRow = worksheet.rowCount;
-      let questionCount = 0;
 
-      category.sections.forEach((section, sectionIndex) => {
-        section.questions.forEach((question, questionIndex) => {
+      category.sections.forEach((section: Section, sectionIndex: number) => {
+        section.questions.forEach((question: Question, questionIndex: number) => {
           const rowIndex = worksheet.rowCount + 1;
           const row = worksheet.addRow(['', question.question, ...question.answers]);
 
-          row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          row.eachCell({ includeEmpty: true }, (cell) => {
             cell.border = borderStyle;
           });
 
@@ -285,11 +260,8 @@ export class BidComparisonTableComponent implements OnInit {
             }
             currentSection = section.name;
             sectionStartRow = rowIndex;
-            questionCount = 0;
           }
-          questionCount++;
 
-          // Handle pricing specifically
           if (section.name === 'Pricing' && question.question === 'Total price for this product/service') {
             const priceAnswers = question.answers.map(price =>
               typeof price === 'number' ? Math.floor(price) :
@@ -298,14 +270,16 @@ export class BidComparisonTableComponent implements OnInit {
             const validPrices = priceAnswers.filter((price): price is number => price !== null && !isNaN(price));
             const lowestPrice = validPrices.length > 0 ? Math.min(...validPrices) : null;
 
-            priceAnswers.forEach((price, index) => {
-              const cell = row.getCell(index + 3); // +3 because first two columns are for section and question
-              cell.value = price;
-              cell.numFmt = '#,##0'; // Format as integer
-              if (price === lowestPrice) {
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF9CFF9C' } }; // Light green fill
+            question.answers.forEach((price, index) => {
+              const cell = row.getCell(index + 3);
+              const numericPrice = typeof price === 'number' ? price :
+                (typeof price === 'string' ? parseFloat(price) : 0);
+              cell.value = numericPrice;
+              cell.numFmt = '#,##0';
+              if (numericPrice === lowestPrice) {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF9CFF9C' } };
               }
-              companyTotals[index] += (price || 0); // Add price to total
+              companyTotals[index] += numericPrice;
             });
           }
 
@@ -315,21 +289,20 @@ export class BidComparisonTableComponent implements OnInit {
         });
       });
 
-      worksheet.addRow([]); // Add an empty row for spacing between categories
+      worksheet.addRow([]);
     });
 
-    // Add "Total Quoted" row
     const totalQuotedRow = worksheet.addRow(['', 'Total Quoted', ...companyTotals]);
     totalQuotedRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-      if (colNumber > 1) { // Skip the first (empty) cell
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ffffffff' } }; // White fill
+      if (colNumber > 1) {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ffffffff' } };
         cell.font = { bold: true };
         cell.border = borderStyle;
       }
     });
   }
 
-  private mergeSectionCells(worksheet: ExcelJS.Worksheet, startRow: number, endRow: number, sectionName: string) {
+  private mergeSectionCells(worksheet: ExcelJS.Worksheet, startRow: number, endRow: number, sectionName: string): void {
     worksheet.mergeCells(startRow, 1, endRow, 1);
     const mergedCell = worksheet.getCell(startRow, 1);
     mergedCell.value = sectionName;
@@ -343,34 +316,22 @@ export class BidComparisonTableComponent implements OnInit {
     };
   }
 
-  private addBorders(worksheet: ExcelJS.Worksheet, startRow: number, startCol: number, endRow: number, endCol: number) {
-    for (let row = startRow; row <= endRow; row++) {
-      for (let col = startCol; col <= endCol; col++) {
-        const cell = worksheet.getCell(row, col);
-        cell.border = {
-          top: { style: 'thin', color: { argb: 'FF008C72' } },
-          left: { style: 'thin', color: { argb: 'FF008C72' } },
-          bottom: { style: 'thin', color: { argb: 'FF008C72' } },
-          right: { style: 'thin', color: { argb: 'FF008C72' } }
-        };
-      }
-    }
-  }
-
   calculateTotals(): void {
     this.companyTotals = new Array(this.bidData.companies.length).fill(0);
 
     this.bidData.productQuestions.forEach(category => {
-      const pricingSection = category.sections.find(s => s.name === 'Pricing');
+      const pricingSection = category.sections.find(function (s) { return s.name === 'Pricing'; });
       if (pricingSection) {
-        const priceQuestion = pricingSection.questions.find(q =>
-          q.question === 'Total price for this product/service'
-        );
+        const priceQuestion = (pricingSection.questions as any[]).find(function (q) {
+          return q.question === 'Total price for this product/service';
+        });
         if (priceQuestion) {
-          priceQuestion.answers.forEach((price, index) => {
+          (priceQuestion.answers as any[]).forEach((price: any, index: number) => {
             const numPrice = typeof price === 'number' ? price :
               (typeof price === 'string' ? parseFloat(price) : 0);
-            this.companyTotals[index] += numPrice;
+            if (!isNaN(numPrice)) {
+              this.companyTotals[index] += numPrice;
+            }
           });
         }
       }
@@ -386,8 +347,6 @@ export class BidComparisonTableComponent implements OnInit {
     const numPrice = typeof price === 'number' ? price : parseFloat(price);
     return numPrice === this.getLowestPrice(prices);
   }
-
-
 }
 
 // import { Component, OnInit } from '@angular/core';

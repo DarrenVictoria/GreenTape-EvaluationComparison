@@ -2,6 +2,26 @@ import { Component, OnInit } from '@angular/core';
 import * as ExcelJS from 'exceljs';
 import * as FileSaver from 'file-saver';
 
+interface TenderDetails {
+  TenderID: string;
+  TenderName: string;
+  TenderModel: string;
+  CreatedBy: string;
+  CreatedOn: string;
+  InvitedParticipants: number;
+  Participated: number;
+  NotSubmitted: number;
+  RejectedTender: number;
+  RroductCount: number;
+  CommitteeMembers: number;
+  CompletedDate: string;
+}
+
+interface GeneralQuestion {
+  category: string;
+  question: string;
+}
+
 interface CommitteeMember {
   name: string;
   role: string;
@@ -13,10 +33,21 @@ interface CommitteeMember {
 interface Company {
   name: string;
   shortlistedMembers: string;
-  answers: { [key: string]: string | number };
+  answers: { [key: string]: string };
   committeeMembers: CommitteeMember[];
 }
 
+interface BidData {
+  tenderDetails: TenderDetails;
+  generalQuestions: GeneralQuestion[];
+  companies: Company[];
+}
+
+interface Product {
+  name: string;
+  generalQuestions: { category: string; question: string }[];
+  companies: Company[];
+}
 
 
 @Component({
@@ -25,10 +56,10 @@ interface Company {
   styleUrls: ['./shortlist-committee-2.component.css']
 })
 export class ShortlistCommittee2Component implements OnInit {
-  companyTotals: number[];
-  companyAvgScores: number[];
+  companyTotals: number[] = [];
+  companyAvgScores: number[] = [];
 
-  bidData = {
+  bidData: BidData = {
     "tenderDetails": {
       "TenderID": "HAY-7-TEN-61",
       "TenderName": "TEN#301 - Supply of Office Supplies",
@@ -366,47 +397,55 @@ export class ShortlistCommittee2Component implements OnInit {
     this.highlightLowestPrice();
   }
 
-
-  calculateCompanyTotals() {
-    this.companyTotals = this.bidData.companies.map(company => {
-      return this.products.products.reduce((total, product) => {
+  calculateCompanyTotals(): void {
+    this.companyTotals = this.bidData.companies.map((company: Company) => {
+      return this.products.products.reduce((total: number, product: Product) => {
         const companyProduct = product.companies.find(c => c.name === company.name);
-        return total + parseFloat(companyProduct.answers['Total price for this product/service'] || '0');
+        return total + (companyProduct ? parseFloat(companyProduct.answers['Total price for this product/service'] || '0') : 0);
       }, 0);
     });
   }
 
-  calculateCompanyAvgScores() {
-    this.companyAvgScores = this.products.products.map(product => {
-      return product.companies.map(company => {
-        const scores = company.committeeMembers
-          .map(member => {
-            const score = parseFloat(member.score);
-            return isNaN(score) ? 0 : score;
-          })
-          .filter(score => score > 0);
-        return scores.length > 0 ? scores.reduce((a, b) => a + b) / scores.length : 0;
+  calculateCompanyAvgScores(): void {
+    if (this.products.products.length === 0 || this.products.products[0].companies.length === 0) {
+      this.companyAvgScores = [];
+      return;
+    }
+
+    const initialScores = new Array(this.products.products[0].companies.length).fill(0);
+
+    this.companyAvgScores = this.products.products.reduce((acc: number[], product: Product) => {
+      const productScores = product.companies.map(company => {
+        const validScores = company.committeeMembers
+          .map(member => parseFloat(member.score))
+          .filter(score => !isNaN(score) && score > 0);
+
+        return validScores.length > 0
+          ? validScores.reduce((a, b) => a + b) / validScores.length
+          : 0;
       });
-    }).reduce((acc, productAvgScores) => {
-      return acc.map((sum, idx) => sum + productAvgScores[idx]);
-    }, Array(this.products.products[0].companies.length).fill(0)).map(totalScore => totalScore / this.products.products.length);
+
+      return acc.map((sum, idx) => sum + productScores[idx]);
+    }, initialScores);
+
+    const productCount = this.products.products.length;
+    this.companyAvgScores = this.companyAvgScores.map(totalScore => totalScore / productCount);
   }
 
-
-  highlightLowestPrice() {
+  highlightLowestPrice(): void {
     this.products.products.forEach(product => {
       let lowestPrice = Infinity;
-      let lowestPriceQuestion = "Total price for this product/service";
+      const lowestPriceQuestion = "Total price for this product/service";
 
       product.companies.forEach(company => {
-        const price = parseFloat(company.answers[lowestPriceQuestion]);
+        const price = parseFloat(company.answers[lowestPriceQuestion] as string);
         if (price < lowestPrice) {
           lowestPrice = price;
         }
       });
 
       product.companies.forEach(company => {
-        company.isLowestPrice = parseFloat(company.answers[lowestPriceQuestion]) === lowestPrice;
+        (company as any).isLowestPrice = parseFloat(company.answers[lowestPriceQuestion] as string) === lowestPrice;
       });
     });
   }
@@ -420,17 +459,15 @@ export class ShortlistCommittee2Component implements OnInit {
     return price === Math.min(...prices);
   }
 
-  // Convert answer to number
   convertAnswerToNumber(answer: string): number {
     return parseFloat(answer);
   }
 
-
-  getShortlistedMembersCount(company: any): number {
+  getShortlistedMembersCount(company: Company): number {
     return company.committeeMembers.filter(member => member.shortlisted === 'YES').length;
   }
 
-  getTotalMembersCount(company: any): number {
+  getTotalMembersCount(company: Company): number {
     return company.committeeMembers.length;
   }
 
@@ -448,26 +485,19 @@ export class ShortlistCommittee2Component implements OnInit {
     return average.toFixed(2) + '%';
   }
 
-
   async getWorksheet(): Promise<ExcelJS.Worksheet> {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Shortlist Committee');
 
-
-
     let currentRow = 1;
 
-    // Set column widths
     worksheet.getColumn(1).width = 36;
     worksheet.getColumn(2).width = 69;
 
-    // Set width for all columns after column 2 to 60 - I set it myself worksheet columns didn't re
     for (let i = 3; i <= 60; i++) {
       worksheet.getColumn(i).width = 42;
     }
 
-
-    // Add an empty bordered row
     const emptyRow = worksheet.addRow([]);
     this.applyTableStyling(worksheet, currentRow, currentRow);
     currentRow++;
@@ -475,7 +505,6 @@ export class ShortlistCommittee2Component implements OnInit {
     currentRow = await this.addGeneralQuestionsTable(worksheet, currentRow);
 
     for (const product of this.products.products) {
-      // Add two empty cells before each product table
       worksheet.addRow([]);
       worksheet.addRow([]);
       currentRow += 2;
@@ -483,7 +512,6 @@ export class ShortlistCommittee2Component implements OnInit {
       currentRow = await this.addProductTable(worksheet, product, currentRow);
     }
 
-    // Add two empty cells before the final summary table
     worksheet.addRow([]);
     worksheet.addRow([]);
     currentRow += 2;
@@ -493,14 +521,13 @@ export class ShortlistCommittee2Component implements OnInit {
     return worksheet;
   }
 
-
   styleHeaderRow(row: ExcelJS.Row) {
     row.eachCell((cell, colNumber) => {
-      if (colNumber > 1) {  // Skip the first column
+      if (colNumber > 1) {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: 'FF00B050' } // Green color
+          fgColor: { argb: 'FF00B050' }
         };
         cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
       }
@@ -512,7 +539,7 @@ export class ShortlistCommittee2Component implements OnInit {
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FFD9D9D9' } // Gray color
+      fgColor: { argb: 'FFD9D9D9' }
     };
     cell.border = {
       top: { style: 'thin', color: { argb: 'FF000000' } },
@@ -528,7 +555,6 @@ export class ShortlistCommittee2Component implements OnInit {
     for (let i = startRow; i <= endRow; i++) {
       const row = worksheet.getRow(i);
       row.eachCell((cell) => {
-        // Only apply border if the cell is not empty
         if (cell.value !== null && cell.value !== '') {
           cell.border = {
             top: { style: 'thin', color: { argb: 'FF006100' } },
@@ -541,9 +567,6 @@ export class ShortlistCommittee2Component implements OnInit {
     }
   }
 
-
-
-
   async addGeneralQuestionsTable(worksheet: ExcelJS.Worksheet, startRow: number): Promise<number> {
     const titleRow = worksheet.addRow(['', 'General Questions']);
     titleRow.font = { bold: true, size: 16 };
@@ -552,7 +575,7 @@ export class ShortlistCommittee2Component implements OnInit {
     const headerRow = worksheet.addRow([
       '',
       'General Questions',
-      ...this.bidData.companies.reduce((acc, c) => acc.concat([c.name, '', '']), [])
+      ...this.bidData.companies.reduce((acc: string[], c: Company) => acc.concat(['', c.name, '']), [])
     ]);
     this.styleHeaderRow(headerRow);
     this.bidData.companies.forEach((_, index) => {
@@ -562,7 +585,7 @@ export class ShortlistCommittee2Component implements OnInit {
     const shortlistedRow = worksheet.addRow([
       '',
       '',
-      ...this.bidData.companies.reduce((acc, c) => acc.concat([c.shortlistedMembers, '', '']), [])
+      ...this.bidData.companies.reduce((acc: string[], c: Company) => acc.concat([c.shortlistedMembers, '', '']), [])
     ]);
     shortlistedRow.getCell(1).font = { bold: true };
     this.bidData.companies.forEach((_, index) => {
@@ -573,9 +596,9 @@ export class ShortlistCommittee2Component implements OnInit {
       const row = worksheet.addRow([
         question.category,
         question.question,
-        ...this.bidData.companies.reduce((acc, company) => acc.concat([company.answers[question.question], '', '']), [])
+        ...this.bidData.companies.reduce((acc: string[], company: Company) => acc.concat([company.answers[question.question], '', '']), [])
       ]);
-      this.styleCategoryCell(row.getCell(1)); // Style the category cell
+      this.styleCategoryCell(row.getCell(1));
       this.bidData.companies.forEach((_, index) => {
         worksheet.mergeCells(row.number, index * 3 + 3, row.number, index * 3 + 5);
       });
@@ -585,7 +608,7 @@ export class ShortlistCommittee2Component implements OnInit {
       const row = worksheet.addRow([
         '',
         category,
-        ...this.bidData.companies.reduce((acc, company) =>
+        ...this.bidData.companies.reduce((acc: string[], company: Company) =>
           acc.concat(company.committeeMembers.map(member =>
             category === 'Committee Member' ? `${member.name} (${member.role})` : (member[category.toLowerCase()] || '')
           )), [])
@@ -596,7 +619,7 @@ export class ShortlistCommittee2Component implements OnInit {
     const avgScoreRow = worksheet.addRow([
       '',
       'Average Score',
-      ...this.bidData.companies.reduce((acc, company) => acc.concat([this.calculateAverageScore(company), '', '']), [])
+      ...this.bidData.companies.reduce((acc: string[], company: Company) => acc.concat([this.calculateAverageScore(company), '', '']), [])
     ]);
     avgScoreRow.getCell(2).font = { bold: true };
     this.bidData.companies.forEach((_, index) => {
@@ -608,57 +631,49 @@ export class ShortlistCommittee2Component implements OnInit {
     return worksheet.rowCount + 1;
   }
 
-  async addProductTable(worksheet: ExcelJS.Worksheet, product: any, startRow: number): Promise<number> {
-
-
+  async addProductTable(worksheet: ExcelJS.Worksheet, product: Product, startRow: number): Promise<number> {
     const titleRow = worksheet.addRow(['', product.name]);
     titleRow.font = { bold: true, size: 16 };
     titleRow.alignment = { horizontal: 'center' };
 
     worksheet.addRow([]);
 
-    // Add header row
     const headerRow = worksheet.addRow([
       'Category',
       'Question',
-      ...product.companies.flatMap(c => ['', c.name, ''])
+      ...product.companies.reduce((acc: string[], c: Company) => acc.concat(['', c.name, '']), [])
     ]);
     this.styleHeaderRow(headerRow);
 
-    // Merge cells in the header row to create colspan for company names
     product.companies.forEach((_, index) => {
       worksheet.mergeCells(startRow, index * 3 + 3, startRow, index * 3 + 5);
     });
 
-    // Add committee members information
     const shortlistedRow = worksheet.addRow([
       '',
       '',
-      ...product.companies.flatMap(c => [c.shortlistedMembers, '', ''])
+      ...product.companies.reduce((acc: string[], c: Company) => acc.concat([c.shortlistedMembers, '', '']), [])
     ]);
     product.companies.forEach((_, index) => {
       worksheet.mergeCells(shortlistedRow.number, index * 3 + 3, shortlistedRow.number, index * 3 + 5);
     });
 
-    // Add general questions
     product.generalQuestions.forEach(question => {
       const row = worksheet.addRow([
         question.category,
         question.question,
-        ...product.companies.flatMap(company => [
+        ...product.companies.reduce((acc: string[], company: Company) => acc.concat([
           company.answers[question.question],
           '',
           ''
-        ])
+        ]), [])
       ]);
-      this.styleCategoryCell(row.getCell(1)); // Style the category cell
+      this.styleCategoryCell(row.getCell(1));
 
-      // Merge cells for each company's answer
       product.companies.forEach((_, index) => {
         worksheet.mergeCells(row.number, index * 3 + 3, row.number, index * 3 + 5);
       });
 
-      // Highlight the lowest price if applicable
       if (question.question === 'Total price for this product/service') {
         const prices = product.companies.map(company => parseFloat(company.answers[question.question]));
         const lowestPrice = Math.min(...prices);
@@ -667,21 +682,19 @@ export class ShortlistCommittee2Component implements OnInit {
             cell.fill = {
               type: 'pattern',
               pattern: 'solid',
-              fgColor: { argb: 'FFD9F3AD' } // Light green fill
+              fgColor: { argb: 'FFD9F3AD' }
             };
           }
         });
       }
     });
 
-    // Committee member details
     const memberRow = worksheet.addRow([
       '',
       'Committee Member',
-
-      ...product.companies.flatMap(company =>
-        company.committeeMembers.map(member => `${member.name} (${member.role})`)
-      )
+      ...product.companies.reduce((acc: string[], company: Company) =>
+        acc.concat(company.committeeMembers.map(member => `${member.name} (${member.role})`))
+        , [])
     ]);
     memberRow.getCell(1).font = { bold: true };
 
@@ -689,10 +702,9 @@ export class ShortlistCommittee2Component implements OnInit {
       const row = worksheet.addRow([
         '',
         category,
-
-        ...product.companies.flatMap(company =>
-          company.committeeMembers.map(member => member[category.toLowerCase()])
-        )
+        ...product.companies.reduce((acc: string[], company: Company) =>
+          acc.concat(company.committeeMembers.map(member => member[category.toLowerCase()]))
+          , [])
       ]);
       row.getCell(1).font = { bold: true };
     });
@@ -703,25 +715,23 @@ export class ShortlistCommittee2Component implements OnInit {
   }
 
   async addFinalSummaryTable(worksheet: ExcelJS.Worksheet, startRow: number): Promise<number> {
-
-
     const titleRow = worksheet.addRow(['', 'Final Summary']);
     titleRow.font = { bold: true, size: 16 };
     titleRow.alignment = { horizontal: 'center' };
 
-
     worksheet.addRow([]);
 
-    const headerRow = worksheet.addRow(['', '', ...this.bidData.companies.map(c => c.name)]);
+    const headerRow = worksheet.addRow(['', '', ...this.bidData.companies.map((c: Company) => c.name)]);
     this.styleHeaderRow(headerRow);
 
-    const totalQuotedRow = worksheet.addRow(['', 'Total Quoted', ...this.companyTotals]);
-    this.styleCategoryCell(totalQuotedRow.getCell(2)); // Style the "Total Quoted" cell
+    const totalQuotedValues = this.companyTotals;
+    const totalQuotedRow = worksheet.addRow(['', 'Total Quoted', ...totalQuotedValues]);
+    this.styleCategoryCell(totalQuotedRow.getCell(2));
     totalQuotedRow.getCell(1).font = { bold: true };
     totalQuotedRow.eachCell((cell, colNumber) => {
       if (colNumber > 2) {
         cell.alignment = { horizontal: 'center' };
-        if (this.isLowestPrice(cell.value as number, this.companyTotals)) {
+        if (this.isLowestPrice(parseFloat(cell.value as string), totalQuotedValues)) {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -731,8 +741,9 @@ export class ShortlistCommittee2Component implements OnInit {
       }
     });
 
-    const avgScoreRow = worksheet.addRow(['', 'Avg Score %', ...this.companyAvgScores.map(score => `${score.toFixed(2)}%`)]);
-    this.styleCategoryCell(avgScoreRow.getCell(2)); // Style the "Avg Score %" cell
+    const avgScoreValues = this.companyAvgScores.map((score: number) => `${score.toFixed(2)}%`);
+    const avgScoreRow = worksheet.addRow(['', 'Avg Score %', ...avgScoreValues]);
+    this.styleCategoryCell(avgScoreRow.getCell(2));
     avgScoreRow.getCell(1).font = { bold: true };
     avgScoreRow.eachCell((cell, colNumber) => {
       if (colNumber > 2) {
