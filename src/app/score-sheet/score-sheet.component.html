@@ -13,86 +13,92 @@
     <p><strong>Committee Members:</strong> {{ bidData.tenderDetails.CommitteeMembers }}</p>
     <p><strong>Completed Date:</strong> {{ bidData.tenderDetails.CompletedDate }}</p>
   </div>
-  <table class="main-table">
-    <thead>
-      <tr>
-        <th>Member</th>
-        <th>Category</th>
-        <th>Section</th>
-        <th>Section Weight</th>
-        <th>Questions</th>
-        <th>Question Weight</th>
-        <ng-container *ngFor="let supplier of members[0]?.suppliers">
-          <th class="toggle-column">
-            <div class="toggle-bar" [class.expanded]="isSupplierExpanded(supplier.name)">
-            </div>
-          </th>
-          <ng-container *ngIf="isSupplierExpanded(supplier.name)">
-            <th>Answers</th>
-            <th>Score per Question</th>
-            <th>Score per Category</th>
-            <th>Score per Section</th>
+
+  <ng-container *ngFor="let committee of committees; let committeeIndex = index">
+    <h2>{{ committee.name }}</h2>
+    <p><strong>Score Range:</strong> {{ committee.scoreRange.start }} - {{ committee.scoreRange.end }}</p>
+
+    <table class="main-table">
+      <thead>
+        <tr>
+          <th>Member</th>
+          <th>Category</th>
+          <th>Section</th>
+          <th>Section Weight</th>
+          <th>Questions</th>
+          <th>Question Weight</th>
+          <ng-container *ngFor="let supplier of committee.members[0]?.suppliers">
+            <th class="toggle-column">
+              <div class="toggle-bar" [class.expanded]="isSupplierExpanded(supplier.name, committeeIndex)">
+              </div>
+            </th>
+            <ng-container *ngIf="isSupplierExpanded(supplier.name, committeeIndex)">
+              <th>Answers</th>
+              <th>Score per Question</th>
+              <th>Score per Category</th>
+              <th>Score per Section</th>
+            </ng-container>
           </ng-container>
-        </ng-container>
-      </tr>
-    </thead>
-    <tbody #tableBody>
-      <ng-container *ngFor="let member of members; trackBy: trackByMember">
-        <ng-container *ngFor="let category of member.categories; let categoryIndex = index; trackBy: trackByCategory">
-          <ng-container *ngFor="let section of category.sections; let sectionIndex = index; trackBy: trackBySection">
-            <tr class="section-row">
-              <td *ngIf="categoryIndex === 0 && sectionIndex === 0" [attr.rowspan]="getTotalRows(member)">{{
-                member.name
-                }}</td>
-              <td *ngIf="sectionIndex === 0" [attr.rowspan]="category.sections.length">{{ category.name }}</td>
-              <td>{{ section.name }}</td>
-              <td>{{ section.sectionWeight }}%</td>
-              <td class="questions-column">
-                <div *ngFor="let question of section.questions" class="question-row">
-                  <span class="question-text">{{ question.id }}</span>
-                </div>
-              </td>
-              <td class="weights-column">
-                <div *ngFor="let question of section.questions" class="question-row">
-                  <span class="weight-text">{{ question.weight }}</span>
-                </div>
-              </td>
-              <ng-container *ngFor="let supplier of member.suppliers">
-                <td *ngIf="categoryIndex === 0 && sectionIndex === 0" class="toggle-column supplier-column"
-                  [attr.data-member]="member.name" [attr.rowspan]="getTotalRows(member)">
-                  <div class="toggle-bar" [class.expanded]="isSupplierExpanded(supplier.name)">
-                    <button class="info-button" (click)="goToSupplierDetails(supplier, $event)">i</button>
-                    <span>
-                      <span class="supplier-name">{{ supplier.name }}</span>
-                      <span class="supplier-score">{{ supplier.scorePercentage }}</span>
-                    </span>
-                    <button class="toggle-button" (click)="toggleSupplier(supplier.name, $event)">
-                      {{ isSupplierExpanded(supplier.name) ? '-' : '+' }}
-                    </button>
+        </tr>
+      </thead>
+      <tbody #tableBody>
+        <ng-container *ngFor="let member of committee.members; trackBy: trackByMember">
+          <ng-container *ngFor="let category of member.categories; let categoryIndex = index; trackBy: trackByCategory">
+            <ng-container *ngFor="let section of category.sections; let sectionIndex = index; trackBy: trackBySection">
+              <tr class="section-row">
+                <td *ngIf="categoryIndex === 0 && sectionIndex === 0" [attr.rowspan]="getTotalRows(member)">
+                  {{ member.name }}
+                </td>
+                <td *ngIf="sectionIndex === 0" [attr.rowspan]="category.sections.length">{{ category.name }}</td>
+                <td>{{ section.name }}</td>
+                <td>{{ section.sectionWeight }}%</td>
+                <td class="questions-column">
+                  <div *ngFor="let question of section.questions" class="question-row">
+                    <span class="question-text">{{ question.id }}</span>
                   </div>
                 </td>
-                <ng-container *ngIf="isSupplierExpanded(supplier.name)">
-                  <ng-container
-                    *ngIf="supplier.data[getCombinedIndex(categoryIndex, sectionIndex, member)] as supplierData">
-                    <td class="answers-column">
-                      <div *ngFor="let question of section.questions" class="question-row">
-                        <span class="answer-text">{{ supplierData.answers[question.id] }}</span>
-                      </div>
-                    </td>
-                    <td class="scores-column">
-                      <div *ngFor="let question of section.questions" class="question-row">
-                        <span class="score-text">{{ supplierData.scores[question.id] }}</span>
-                      </div>
-                    </td>
-                    <td>{{ supplierData.categoryScore }}</td>
-                    <td>{{ supplierData.sectionScore }}</td>
+                <td class="weights-column">
+                  <div *ngFor="let question of section.questions" class="question-row">
+                    <span class="weight-text">{{ question.weight }}</span>
+                  </div>
+                </td>
+                <ng-container *ngFor="let supplier of member.suppliers">
+                  <td *ngIf="categoryIndex === 0 && sectionIndex === 0" class="toggle-column supplier-column"
+                    [attr.data-member]="member.name" [attr.rowspan]="getTotalRows(member)">
+                    <div class="toggle-bar" [class.expanded]="isSupplierExpanded(supplier.name, committeeIndex)">
+                      <button class="info-button" (click)="goToSupplierDetails(supplier, $event)">i</button>
+                      <span>
+                        <span class="supplier-name">{{ supplier.name }}</span>
+                        <span class="supplier-score">{{ supplier.scorePercentage }}</span>
+                      </span>
+                      <button class="toggle-button" (click)="toggleSupplier(supplier.name, committeeIndex, $event)">
+                        {{ isSupplierExpanded(supplier.name, committeeIndex) ? '-' : '+' }}
+                      </button>
+                    </div>
+                  </td>
+                  <ng-container *ngIf="isSupplierExpanded(supplier.name, committeeIndex)">
+                    <ng-container
+                      *ngIf="supplier.data[getCombinedIndex(categoryIndex, sectionIndex, member)] as supplierData">
+                      <td class="answers-column">
+                        <div *ngFor="let question of section.questions" class="question-row">
+                          <span class="answer-text">{{ supplierData.answers[question.id] }}</span>
+                        </div>
+                      </td>
+                      <td class="scores-column">
+                        <div *ngFor="let question of section.questions" class="question-row">
+                          <span class="score-text">{{ supplierData.scores[question.id] }}</span>
+                        </div>
+                      </td>
+                      <td>{{ supplierData.categoryScore }}</td>
+                      <td>{{ supplierData.sectionScore }}</td>
+                    </ng-container>
                   </ng-container>
                 </ng-container>
-              </ng-container>
-            </tr>
+              </tr>
+            </ng-container>
           </ng-container>
         </ng-container>
-      </ng-container>
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </ng-container>
 </div>

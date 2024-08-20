@@ -48,7 +48,12 @@ export class ScoreSheetComponent implements OnInit, AfterViewInit {
 
 
 
-  committees: string[] = ['Committee 1', 'Committee 2', 'Committee 3'];
+
+  committeeScoreRanges = [
+    { committee: 1, start: 0, end: 10 },
+  ];
+
+  expandedSuppliers: { [committeeIndex: number]: { [supplierName: string]: boolean } } = {};
 
   bidData = {
     "tenderDetails": {
@@ -64,568 +69,1131 @@ export class ScoreSheetComponent implements OnInit, AfterViewInit {
       "RroductCount": 18,
       "CommitteeMembers": 3,
       "CompletedDate": "20/10/2021 15:00"
-    }
+    },
   };
 
-  committeeScoreRanges = [
-    { committee: 1, start: 0, end: 10 },
-  ];
 
-  expandedSuppliers: { [key: string]: boolean } = {};
-
-  members: Member[] = [
+  committees = [
     {
-      name: 'Jack',
-      categories: [
+      name: "Committee 1",
+      scoreRange: { start: 0, end: 10 },
+      members: [
         {
-          name: 'General',
-          sections: [
-            {
-              name: 'Approach and Methodology',
-              sectionWeight: 30,
-              questions: [
-                { id: 'How do you plan to manage and mitigate potential risks associated with this project?', weight: 50 },
-                { id: 'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?', weight: 50 }
-              ]
-            },
-            {
-              name: 'Experience',
-              sectionWeight: 70,
-              questions: [
-                {
-                  id: 'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?', weight: 40
-                },
-                { id: 'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?', weight: 30 }
-              ]
-            }
-          ]
-        },
-        {
-          name: 'Product',
-          sections: [
-            {
-              name: 'Financial',
-              sectionWeight: 20,
-              questions: [
-                {
-                  id: 'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?', weight: 10
-                },
-                { id: 'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?', weight: 10 },
-                { id: 'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?', weight: 80 }
-              ]
-            },
-            {
-              name: 'Technical',
-              sectionWeight: 20,
-              questions: [
-                { id: 'What is your proposed timeline for project implementation, including key milestones and deliverables?', weight: 70 },
-                { id: 'How does your solution address scalability and future technological advancements?', weight: 30 }
-              ]
-            },
+          name: 'Jack',
+          categories: [
             {
               name: 'General',
-              sectionWeight: 60,
-              questions: [
+              sections: [
                 {
-                  id: 'What is your companies approach to quality control and assurance?', weight: 50
+                  name: 'Approach and Methodology',
+                  sectionWeight: 30,
+                  questions: [
+                    { id: 'How do you plan to manage and mitigate potential risks associated with this project?', weight: 50 },
+                    { id: 'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?', weight: 50 }
+                  ]
                 },
-                { id: 'Can you provide details on your supply chain management and logistics capabilities?', weight: 25 },
-                { id: 'How does your pricing structure compare to industry standards, and what value-added services do you offer?', weight: 25 }
+                {
+                  name: 'Experience',
+                  sectionWeight: 70,
+                  questions: [
+                    {
+                      id: 'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?', weight: 40
+                    },
+                    { id: 'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?', weight: 30 }
+                  ]
+                }
+              ]
+            },
+            {
+              name: 'Product',
+              sections: [
+                {
+                  name: 'Financial',
+                  sectionWeight: 20,
+                  questions: [
+                    {
+                      id: 'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?', weight: 10
+                    },
+                    { id: 'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?', weight: 10 },
+                    { id: 'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?', weight: 80 }
+                  ]
+                },
+                {
+                  name: 'Technical',
+                  sectionWeight: 20,
+                  questions: [
+                    { id: 'What is your proposed timeline for project implementation, including key milestones and deliverables?', weight: 70 },
+                    { id: 'How does your solution address scalability and future technological advancements?', weight: 30 }
+                  ]
+                },
+                {
+                  name: 'General',
+                  sectionWeight: 60,
+                  questions: [
+                    {
+                      id: 'What is your companies approach to quality control and assurance?', weight: 50
+                    },
+                    { id: 'Can you provide details on your supply chain management and logistics capabilities?', weight: 25 },
+                    { id: 'How does your pricing structure compare to industry standards, and what value-added services do you offer?', weight: 25 }
+                  ]
+                }
               ]
             }
-          ]
-        }
-      ],
-      suppliers: [
-        {
-          name: 'Supplier 1',
-          scorePercentage: '40%',
-          expanded: false,
-          data: [
+          ],
+          suppliers: [
             {
-              answers: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
-              },
-              scores: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 8,
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
-              },
-              categoryScore: 67.3,
-              sectionScore: 22.5
+              name: 'Supplier 1',
+              scorePercentage: '40%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
             {
-              answers: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
-              },
-              scores: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
-              },
-              categoryScore: 67.3,
-              sectionScore: 44.8
+              name: 'Supplier 2',
+              scorePercentage: '70%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
             {
-              answers: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
-              },
-              scores: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
-              },
-              categoryScore: 76.3,
-              sectionScore: 15.8
+              name: 'Supplier 3',
+              scorePercentage: '90%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
-            {
-              answers: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
-                'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
-              },
-              scores: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
-                'How does your solution address scalability and future technological advancements?': 7
-              },
-              categoryScore: 76.3,
-              sectionScore: 17
-            },
-            {
-              answers: {
-                'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
-                'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
-              },
-              scores: {
-                'What is your companies approach to quality control and assurance?': 9,
-                'Can you provide details on your supply chain management and logistics capabilities?': 7,
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
-              },
-              categoryScore: 76.3,
-              sectionScore: 43.5
-            }
           ]
         },
         {
-          name: 'Supplier 2',
-          scorePercentage: '70%',
-          expanded: false,
-          data: [
+          name: 'Mark',
+          categories: [
             {
-              answers: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
-              },
-              scores: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 8,
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
-              },
-              categoryScore: 67.3,
-              sectionScore: 22.5
+              name: 'General',
+              sections: [
+                {
+                  name: 'Approach and Methodology',
+                  sectionWeight: 30,
+                  questions: [
+                    { id: 'How do you plan to manage and mitigate potential risks associated with this project?', weight: 50 },
+                    { id: 'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?', weight: 50 }
+                  ]
+                },
+                {
+                  name: 'Experience',
+                  sectionWeight: 70,
+                  questions: [
+                    {
+                      id: 'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?', weight: 40
+                    },
+                    { id: 'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?', weight: 30 }
+                  ]
+                }
+              ]
             },
             {
-              answers: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
-              },
-              scores: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
-              },
-              categoryScore: 67.3,
-              sectionScore: 44.8
-            },
-            {
-              answers: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
-              },
-              scores: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
-              },
-              categoryScore: 76.3,
-              sectionScore: 15.8
-            },
-            {
-              answers: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
-                'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
-              },
-              scores: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
-                'How does your solution address scalability and future technological advancements?': 7
-              },
-              categoryScore: 76.3,
-              sectionScore: 17
-            },
-            {
-              answers: {
-                'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
-                'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
-              },
-              scores: {
-                'What is your companies approach to quality control and assurance?': 9,
-                'Can you provide details on your supply chain management and logistics capabilities?': 7,
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
-              },
-              categoryScore: 76.3,
-              sectionScore: 43.5
+              name: 'Product',
+              sections: [
+                {
+                  name: 'Financial',
+                  sectionWeight: 20,
+                  questions: [
+                    {
+                      id: 'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?', weight: 10
+                    },
+                    { id: 'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?', weight: 10 },
+                    { id: 'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?', weight: 80 }
+                  ]
+                },
+                {
+                  name: 'Technical',
+                  sectionWeight: 20,
+                  questions: [
+                    { id: 'What is your proposed timeline for project implementation, including key milestones and deliverables?', weight: 70 },
+                    { id: 'How does your solution address scalability and future technological advancements?', weight: 30 }
+                  ]
+                },
+                {
+                  name: 'General',
+                  sectionWeight: 60,
+                  questions: [
+                    {
+                      id: 'What is your companies approach to quality control and assurance?', weight: 50
+                    },
+                    { id: 'Can you provide details on your supply chain management and logistics capabilities?', weight: 25 },
+                    { id: 'How does your pricing structure compare to industry standards, and what value-added services do you offer?', weight: 25 }
+                  ]
+                }
+              ]
             }
-          ]
-        },
-        {
-          name: 'Supplier 3',
-          scorePercentage: '90%',
-          expanded: false,
-          data: [
+          ],
+          suppliers: [
             {
-              answers: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
-              },
-              scores: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 8,
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
-              },
-              categoryScore: 67.3,
-              sectionScore: 22.5
+              name: 'Supplier 1',
+              scorePercentage: '40%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
             {
-              answers: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
-              },
-              scores: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
-              },
-              categoryScore: 67.3,
-              sectionScore: 44.8
+              name: 'Supplier 2',
+              scorePercentage: '70%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
             {
-              answers: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
-              },
-              scores: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
-              },
-              categoryScore: 76.3,
-              sectionScore: 15.8
+              name: 'Supplier 3',
+              scorePercentage: '90%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
-            {
-              answers: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
-                'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
-              },
-              scores: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
-                'How does your solution address scalability and future technological advancements?': 7
-              },
-              categoryScore: 76.3,
-              sectionScore: 17
-            },
-            {
-              answers: {
-                'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
-                'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
-              },
-              scores: {
-                'What is your companies approach to quality control and assurance?': 9,
-                'Can you provide details on your supply chain management and logistics capabilities?': 7,
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
-              },
-              categoryScore: 76.3,
-              sectionScore: 43.5
-            }
           ]
         },
       ]
     },
     {
-      name: 'Mark',
-      categories: [
+      name: "Committee 2",
+      scoreRange: { start: 11, end: 20 },
+      members: [
         {
-          name: 'General',
-          sections: [
-            {
-              name: 'Approach and Methodology',
-              sectionWeight: 30,
-              questions: [
-                { id: 'How do you plan to manage and mitigate potential risks associated with this project?', weight: 50 },
-                { id: 'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?', weight: 50 }
-              ]
-            },
-            {
-              name: 'Experience',
-              sectionWeight: 70,
-              questions: [
-                {
-                  id: 'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?', weight: 40
-                },
-                { id: 'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?', weight: 30 }
-              ]
-            }
-          ]
-        },
-        {
-          name: 'Product',
-          sections: [
-            {
-              name: 'Financial',
-              sectionWeight: 20,
-              questions: [
-                {
-                  id: 'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?', weight: 10
-                },
-                { id: 'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?', weight: 10 },
-                { id: 'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?', weight: 80 }
-              ]
-            },
-            {
-              name: 'Technical',
-              sectionWeight: 20,
-              questions: [
-                { id: 'What is your proposed timeline for project implementation, including key milestones and deliverables?', weight: 70 },
-                { id: 'How does your solution address scalability and future technological advancements?', weight: 30 }
-              ]
-            },
+          name: 'Matt',
+          categories: [
             {
               name: 'General',
-              sectionWeight: 60,
-              questions: [
+              sections: [
                 {
-                  id: 'What is your companies approach to quality control and assurance?', weight: 50
+                  name: 'Approach and Methodology',
+                  sectionWeight: 30,
+                  questions: [
+                    { id: 'How do you plan to manage and mitigate potential risks associated with this project?', weight: 50 },
+                    { id: 'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?', weight: 50 }
+                  ]
                 },
-                { id: 'Can you provide details on your supply chain management and logistics capabilities?', weight: 25 },
-                { id: 'How does your pricing structure compare to industry standards, and what value-added services do you offer?', weight: 25 }
+                {
+                  name: 'Experience',
+                  sectionWeight: 70,
+                  questions: [
+                    {
+                      id: 'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?', weight: 40
+                    },
+                    { id: 'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?', weight: 30 }
+                  ]
+                }
+              ]
+            },
+            {
+              name: 'Product',
+              sections: [
+                {
+                  name: 'Financial',
+                  sectionWeight: 20,
+                  questions: [
+                    {
+                      id: 'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?', weight: 10
+                    },
+                    { id: 'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?', weight: 10 },
+                    { id: 'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?', weight: 80 }
+                  ]
+                },
+                {
+                  name: 'Technical',
+                  sectionWeight: 20,
+                  questions: [
+                    { id: 'What is your proposed timeline for project implementation, including key milestones and deliverables?', weight: 70 },
+                    { id: 'How does your solution address scalability and future technological advancements?', weight: 30 }
+                  ]
+                },
+                {
+                  name: 'General',
+                  sectionWeight: 60,
+                  questions: [
+                    {
+                      id: 'What is your companies approach to quality control and assurance?', weight: 50
+                    },
+                    { id: 'Can you provide details on your supply chain management and logistics capabilities?', weight: 25 },
+                    { id: 'How does your pricing structure compare to industry standards, and what value-added services do you offer?', weight: 25 }
+                  ]
+                }
               ]
             }
-          ]
-        }
-      ],
-      suppliers: [
-        {
-          name: 'Supplier 1',
-          scorePercentage: '40%',
-          expanded: false,
-          data: [
+          ],
+          suppliers: [
             {
-              answers: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
-              },
-              scores: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 8,
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
-              },
-              categoryScore: 67.3,
-              sectionScore: 22.5
+              name: 'Supplier 1',
+              scorePercentage: '40%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
             {
-              answers: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
-              },
-              scores: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
-              },
-              categoryScore: 67.3,
-              sectionScore: 44.8
+              name: 'Supplier 2',
+              scorePercentage: '70%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
             {
-              answers: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
-              },
-              scores: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
-              },
-              categoryScore: 76.3,
-              sectionScore: 15.8
+              name: 'Supplier 3',
+              scorePercentage: '90%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
-            {
-              answers: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
-                'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
-              },
-              scores: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
-                'How does your solution address scalability and future technological advancements?': 7
-              },
-              categoryScore: 76.3,
-              sectionScore: 17
-            },
-            {
-              answers: {
-                'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
-                'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
-              },
-              scores: {
-                'What is your companies approach to quality control and assurance?': 9,
-                'Can you provide details on your supply chain management and logistics capabilities?': 7,
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
-              },
-              categoryScore: 76.3,
-              sectionScore: 43.5
-            }
           ]
         },
         {
-          name: 'Supplier 2',
-          scorePercentage: '70%',
-          expanded: false,
-          data: [
+          name: 'John',
+          categories: [
             {
-              answers: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
-              },
-              scores: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 8,
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
-              },
-              categoryScore: 67.3,
-              sectionScore: 22.5
+              name: 'General',
+              sections: [
+                {
+                  name: 'Approach and Methodology',
+                  sectionWeight: 30,
+                  questions: [
+                    { id: 'How do you plan to manage and mitigate potential risks associated with this project?', weight: 50 },
+                    { id: 'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?', weight: 50 }
+                  ]
+                },
+                {
+                  name: 'Experience',
+                  sectionWeight: 70,
+                  questions: [
+                    {
+                      id: 'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?', weight: 40
+                    },
+                    { id: 'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?', weight: 30 }
+                  ]
+                }
+              ]
             },
             {
-              answers: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
-              },
-              scores: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
-              },
-              categoryScore: 67.3,
-              sectionScore: 44.8
-            },
-            {
-              answers: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
-              },
-              scores: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
-              },
-              categoryScore: 76.3,
-              sectionScore: 15.8
-            },
-            {
-              answers: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
-                'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
-              },
-              scores: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
-                'How does your solution address scalability and future technological advancements?': 7
-              },
-              categoryScore: 76.3,
-              sectionScore: 17
-            },
-            {
-              answers: {
-                'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
-                'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
-              },
-              scores: {
-                'What is your companies approach to quality control and assurance?': 9,
-                'Can you provide details on your supply chain management and logistics capabilities?': 7,
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
-              },
-              categoryScore: 76.3,
-              sectionScore: 43.5
+              name: 'Product',
+              sections: [
+                {
+                  name: 'Financial',
+                  sectionWeight: 20,
+                  questions: [
+                    {
+                      id: 'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?', weight: 10
+                    },
+                    { id: 'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?', weight: 10 },
+                    { id: 'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?', weight: 80 }
+                  ]
+                },
+                {
+                  name: 'Technical',
+                  sectionWeight: 20,
+                  questions: [
+                    { id: 'What is your proposed timeline for project implementation, including key milestones and deliverables?', weight: 70 },
+                    { id: 'How does your solution address scalability and future technological advancements?', weight: 30 }
+                  ]
+                },
+                {
+                  name: 'General',
+                  sectionWeight: 60,
+                  questions: [
+                    {
+                      id: 'What is your companies approach to quality control and assurance?', weight: 50
+                    },
+                    { id: 'Can you provide details on your supply chain management and logistics capabilities?', weight: 25 },
+                    { id: 'How does your pricing structure compare to industry standards, and what value-added services do you offer?', weight: 25 }
+                  ]
+                }
+              ]
             }
-          ]
-        },
-        {
-          name: 'Supplier 3',
-          scorePercentage: '90%',
-          expanded: false,
-          data: [
+          ],
+          suppliers: [
             {
-              answers: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
-              },
-              scores: {
-                'How do you plan to manage and mitigate potential risks associated with this project?': 8,
-                'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
-              },
-              categoryScore: 67.3,
-              sectionScore: 22.5
+              name: 'Supplier 1',
+              scorePercentage: '40%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
             {
-              answers: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
-              },
-              scores: {
-                'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
-                'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
-              },
-              categoryScore: 67.3,
-              sectionScore: 44.8
+              name: 'Supplier 2',
+              scorePercentage: '70%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
             {
-              answers: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
-              },
-              scores: {
-                'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
-                'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
-                'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
-              },
-              categoryScore: 76.3,
-              sectionScore: 15.8
+              name: 'Supplier 3',
+              scorePercentage: '90%',
+              expanded: false,
+              data: [
+                {
+                  answers: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 'We use a comprehensive risk management framework.',
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 'We employ Agile methodologies with regular sprints and quality checks.'
+                  },
+                  scores: {
+                    'How do you plan to manage and mitigate potential risks associated with this project?': 8,
+                    'What specific methodologies or frameworks will you use to ensure timely delivery and quality outcomes?': 7
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 22.5
+                },
+                {
+                  answers: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 'We have completed 3 similar projects in the last 5 years, all within budget and meeting all objectives.',
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 'Our team includes certified project managers and technical experts in the required fields.'
+                  },
+                  scores: {
+                    'Can you provide detailed examples of similar projects you completed in the last 5 years, including scope, budget, and outcomes?': 9,
+                    'How does your teams expertise align with the unique requirements of this project, and what specialized skills can you bring to ensure its success?': 8
+                  },
+                  categoryScore: 67.3,
+                  sectionScore: 44.8
+                },
+                {
+                  answers: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 'We have a dedicated risk management team and conduct regular audits.',
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 'Our fee structure is transparent with no hidden costs. We charge a flat rate plus performance bonuses.',
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 'We have successfully completed 5 similar projects in the past 3 years. Case studies are available upon request.'
+                  },
+                  scores: {
+                    'What is your firms approach to risk management, and how do you ensure compliance with relevant financial regulations?': 7,
+                    'Can you provide details on your fee structure, including any hidden costs or additional charges that may apply?': 8,
+                    'What is your track record in handling projects similar to ours, and can you provide case studies or references from comparable clients?': 9
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 15.8
+                },
+                {
+                  answers: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
+                    'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
+                  },
+                  scores: {
+                    'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
+                    'How does your solution address scalability and future technological advancements?': 7
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 17
+                },
+                {
+                  answers: {
+                    'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
+                    'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
+                  },
+                  scores: {
+                    'What is your companies approach to quality control and assurance?': 9,
+                    'Can you provide details on your supply chain management and logistics capabilities?': 7,
+                    'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
+                  },
+                  categoryScore: 76.3,
+                  sectionScore: 43.5
+                }
+              ]
             },
-            {
-              answers: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 'We propose a 6-month timeline with monthly milestones and deliverables.',
-                'How does your solution address scalability and future technological advancements?': 'Our solution is built on a modular architecture allowing for easy scaling and integration of new technologies.'
-              },
-              scores: {
-                'What is your proposed timeline for project implementation, including key milestones and deliverables?': 8,
-                'How does your solution address scalability and future technological advancements?': 7
-              },
-              categoryScore: 76.3,
-              sectionScore: 17
-            },
-            {
-              answers: {
-                'What is your companies approach to quality control and assurance?': 'We have a dedicated QA team and use automated testing alongside manual checks.',
-                'Can you provide details on your supply chain management and logistics capabilities?': 'We use advanced supply chain management software and have partnerships with major logistics providers.',
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 'Our pricing is competitive with added services like 24/7 support and regular consultations.'
-              },
-              scores: {
-                'What is your companies approach to quality control and assurance?': 9,
-                'Can you provide details on your supply chain management and logistics capabilities?': 7,
-                'How does your pricing structure compare to industry standards, and what value-added services do you offer?': 8
-              },
-              categoryScore: 76.3,
-              sectionScore: 43.5
-            }
           ]
         },
       ]
@@ -637,11 +1205,7 @@ export class ScoreSheetComponent implements OnInit, AfterViewInit {
   constructor(private router: Router) { }
 
   ngOnInit() {
-    if (this.members.length > 0 && this.members[0].suppliers.length > 0) {
-      this.members[0].suppliers.forEach(supplier => {
-        this.expandedSuppliers[supplier.name] = false;
-      });
-    }
+
   }
 
   ngAfterViewInit() {
@@ -692,13 +1256,21 @@ export class ScoreSheetComponent implements OnInit, AfterViewInit {
     return member.categories.reduce((sum: number, cat: any) => sum + cat.sections.length, 0);
   }
 
-  toggleSupplier(supplierName: string, event: Event) {
-    event.stopPropagation();
-    this.expandedSuppliers[supplierName] = !this.expandedSuppliers[supplierName];
+  isSupplierExpanded(supplierName: string, committeeIndex: number): boolean {
+    if (this.expandedSuppliers[committeeIndex] &&
+      this.expandedSuppliers[committeeIndex][supplierName] !== undefined) {
+      return this.expandedSuppliers[committeeIndex][supplierName];
+    }
+    return false;
   }
 
-  isSupplierExpanded(supplierName: string): boolean {
-    return this.expandedSuppliers[supplierName] || false;
+  toggleSupplier(supplierName: string, committeeIndex: number, event: Event) {
+    event.stopPropagation();
+    if (!this.expandedSuppliers[committeeIndex]) {
+      this.expandedSuppliers[committeeIndex] = {};
+    }
+    this.expandedSuppliers[committeeIndex][supplierName] =
+      !this.expandedSuppliers[committeeIndex][supplierName];
   }
 
   goToSupplierDetails(supplier: any, event: Event) {
@@ -742,9 +1314,6 @@ export class ScoreSheetComponent implements OnInit, AfterViewInit {
     }
   }
 
-
-
-
   async getWorksheet(): Promise<ExcelJS.Worksheet> {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Score Sheet');
@@ -759,38 +1328,91 @@ export class ScoreSheetComponent implements OnInit, AfterViewInit {
       { width: 18 },  // Question Weight
     ];
 
-    // Add supplier columns
-    this.members[0].suppliers.forEach(() => {
-      worksheet.columns.push(
-        { width: 20 },  // Supplier name and score
-        { width: 50 },  // Answers
-        { width: 18 },  // Score per Question
-        { width: 18 },  // Score per Category
-        { width: 18 }   // Score per Section
-      );
-    });
 
+    let currentRow = 1;
 
+    for (const committee of this.committees) {
+      // Add committee information
+      worksheet.getCell(`A${currentRow}`).value = committee.name;
+      worksheet.getCell(`A${currentRow + 1}`).value = `Score Range ${committee.scoreRange.start} - ${committee.scoreRange.end}`;
 
+      currentRow += 3; // Leave a blank row after committee info
 
+      // Add header row
+      const headerRow = worksheet.getRow(currentRow);
+      headerRow.values = [
+        'Member', 'Category', 'Section', 'Section Weight', 'Questions', 'Question Weight',
+        ...committee.members[0].suppliers.reduce((acc, supplier) => {
+          acc.push(
+            'Supplier (Score)',
+            'Answers',
+            'Score per Question',
+            'Score per Category',
+            'Score per Section'
+          );
+          return acc;
+        }, [])
+      ];
 
-    // Add header row
-    const headerRow = worksheet.addRow([
-      'Member', 'Category', 'Section', 'Section Weight', 'Questions', 'Question Weight',
-      ...this.members[0].suppliers.reduce((acc, supplier) => {
-        acc.push(
-          'Supplier (Score)',
-          'Answers',
-          'Score per Question',
-          'Score per Category',
-          'Score per Section'
-        );
-        return acc;
-      }, [])
-    ]);
+      // Style header row (same as before)
+      this.styleHeaderRow(headerRow);
 
-    // Style header row
-    headerRow.eachCell((cell) => {
+      currentRow++;
+
+      // Add data rows
+      for (const member of committee.members) {
+        for (const category of member.categories) {
+          for (const section of category.sections) {
+            const questionIds = section.questions.map(q => q.id).join('\n---------\n');
+            const questionWeights = section.questions.map(q => q.weight + '%').join('\n---------\n');
+
+            const baseRow = [
+              member.name,
+              category.name,
+              section.name,
+              section.sectionWeight + '%',
+              questionIds,
+              questionWeights
+            ];
+
+            for (const supplier of member.suppliers) {
+              const supplierData = supplier.data.find(d =>
+                d.answers && Object.keys(d.answers).some(key => section.questions.some(q => q.id === key))
+              );
+
+              if (supplierData) {
+                const answers = section.questions.map(q => supplierData.answers[q.id] || '').join('\n---------\n');
+                const scores = section.questions.map(q => supplierData.scores[q.id] || '').join('\n---------\n');
+
+                baseRow.push(
+                  `${supplier.name} (${supplier.scorePercentage})`,
+                  answers,
+                  scores,
+                  supplierData.categoryScore.toString(),
+                  supplierData.sectionScore.toString()
+                );
+              } else {
+                baseRow.push(`${supplier.name} (${supplier.scorePercentage})`, '', '', '', '');
+              }
+            }
+
+            const row = worksheet.addRow(baseRow);
+            this.styleDataRow(row);
+            currentRow++;
+          }
+        }
+      }
+
+      // Add some space between committees
+      currentRow += 2;
+    }
+
+    return worksheet;
+  }
+
+  // Helper methods for styling
+  private styleHeaderRow(row: ExcelJS.Row) {
+    row.eachCell((cell) => {
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
@@ -805,90 +1427,29 @@ export class ScoreSheetComponent implements OnInit, AfterViewInit {
         right: { style: 'thin' }
       };
     });
+  }
 
-    this.members.forEach(member => {
-      member.categories.forEach(category => {
-        category.sections.forEach(section => {
-          const questionIds = section.questions.map(q => q.id).join('\n---------\n');
-          const questionWeights = section.questions.map(q => q.weight + '%').join('\n---------\n');
+  private styleDataRow(row: ExcelJS.Row) {
+    row.eachCell((cell, colNumber) => {
+      cell.alignment = { vertical: 'top', wrapText: true };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
 
-          const baseRow = [
-            member.name,
-            category.name,
-            section.name,
-            section.sectionWeight + '%',
-            questionIds,
-            questionWeights
-          ];
-
-          member.suppliers.forEach(supplier => {
-            const supplierData = supplier.data.find(d =>
-              d.answers && Object.keys(d.answers).some(key => section.questions.some(q => q.id === key))
-            );
-
-            if (supplierData) {
-              const answers = section.questions.map(q => supplierData.answers[q.id] || '').join('\n---------\n');
-              const scores = section.questions.map(q => supplierData.scores[q.id] || '').join('\n---------\n');
-
-              baseRow.push(
-                `${supplier.name} (${supplier.scorePercentage})`,
-                answers,
-                scores,
-                supplierData.categoryScore.toString(),
-                supplierData.sectionScore.toString()
-              );
-            } else {
-              baseRow.push(`${supplier.name} (${supplier.scorePercentage})`, '', '', '', '');
-            }
-          });
-
-          const row = worksheet.addRow(baseRow);
-
-          // Style the row
-          row.eachCell((cell, colNumber) => {
-            cell.alignment = { vertical: 'top', wrapText: true };
-            cell.border = {
-              top: { style: 'thin' },
-              left: { style: 'thin' },
-              bottom: { style: 'thin' },
-              right: { style: 'thin' }
-            };
-
-            // Add extra formatting for cells with multiple lines
-            if ([5, 6].includes(colNumber) || colNumber > 7) {
-              cell.alignment.wrapText = true;
-            }
-            // Fill supplier score columns with light green color
-            if (colNumber > 6 && (colNumber - 7) % 5 === 0) {
-              cell.fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'FFE6FFE6' }  // Light green color
-              };
-            }
-
-          });
-        });
-      });
+      if ([5, 6].includes(colNumber) || colNumber > 7) {
+        cell.alignment.wrapText = true;
+      }
+      if (colNumber > 6 && (colNumber - 7) % 5 === 0) {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFE6FFE6' }  // Light green color
+        };
+      }
     });
-
-    // Merge cells for Member and Category columns
-    let memberRowStart = 2;
-    this.members.forEach(member => {
-      const memberRowEnd = memberRowStart + this.getTotalRows(member) - 1;
-      worksheet.mergeCells(`A${memberRowStart}:A${memberRowEnd}`);
-
-      let categoryRowStart = memberRowStart;
-      member.categories.forEach(category => {
-        const categoryRowEnd = categoryRowStart + category.sections.length - 1;
-        worksheet.mergeCells(`B${categoryRowStart}:B${categoryRowEnd}`);
-        categoryRowStart = categoryRowEnd + 1;
-      });
-
-      memberRowStart = memberRowEnd + 1;
-    });
-
-    return worksheet;
   }
 
 }
