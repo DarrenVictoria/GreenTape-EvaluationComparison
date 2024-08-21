@@ -10,20 +10,37 @@ interface CommitteeMember {
   shortlisted: string;
 }
 
+interface Product {
+  name: string;
+  unitCount: number;
+  generalQuestions: { category: string; question: string }[];
+  companies: Company[];
+}
+
 interface Company {
   name: string;
-  shortlistedMembers: string;
+  awardedUnits: number;
   answers: { [key: string]: string | number };
   committeeMembers: CommitteeMember[];
   isLowestPrice?: boolean;
 }
 
-interface Product {
+interface RejectedSupplier {
   name: string;
-  generalQuestions: { category: string; question: string }[];
-  companies: Company[];
+  answers: { [key: string]: string | number };
+  committeeMembers: CommitteeMember[];
+  isLowestPrice?: boolean;
 }
 
+interface RejectedProduct {
+  name: string;
+  generalQuestions: { category: string; question: string }[];
+  suppliers: RejectedSupplier[];
+}
+
+interface RejectedProductsData {
+  products: RejectedProduct[];
+}
 
 @Component({
   selector: 'app-awarder',
@@ -46,16 +63,16 @@ export class AwarderComponent implements OnInit {
       "NotSubmitted": 2,
       "RejectedTender": 1,
       "RroductCount": 18,
-      "CommitteeMembers": 3,
+      "CommitteeMembers": 1,
       "CompletedDate": "20/10/2021 15:00"
     },
-
   };
 
   shortlistedproducts = {
     "products": [
       {
         "name": "Traditional Laptops",
+        "unitCount": 100,
         "generalQuestions": [
           { "category": "Financial", "question": "Total price for this product/service" },
           { "category": "Technical", "question": "Do you have data controls?" }
@@ -63,7 +80,8 @@ export class AwarderComponent implements OnInit {
         "companies": [
           {
             "name": "Office Hub Ltd",
-            "shortlistedMembers": "2 / 2 Members Shortlisted this Supplier",
+            "awardedUnits": 50,
+            "shortlistedMembers": "1 / 1 Member Shortlisted this Supplier",
             "answers": {
               "Total price for this product/service": "15000",
               "Do you have data controls?": "Yes"
@@ -71,86 +89,46 @@ export class AwarderComponent implements OnInit {
             "committeeMembers": [
               {
                 "name": "Dinusha Hewage",
-                "role": "Member",
+                "role": "Award Nominee",
                 "score": "66%",
                 "comment": "Ok. Guarantee period and maintenance clause is acceptable.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "81%",
-                "comment": "On both projects before this, the supplier has provided the best quality products. Email proof from user included.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
                 "shortlisted": "YES"
               }
             ]
           },
           {
             "name": "Supplies Unlimited",
-            "shortlistedMembers": "0 / 2 Members Shortlisted this Supplier",
+            "awardedUnits": 50,
+            "shortlistedMembers": "0 / 1 Member Shortlisted this Supplier",
             "answers": {
               "Total price for this product/service": "89000",
               "Do you have data controls?": "No"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Matthew Bolt",
+                "role": "Award Nominee",
                 "score": "15%",
                 "comment": "Not Short Listed, since the warranty period of the product was less than required period.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "25%",
-                "comment": "Not Short Listed, since the warranty period of the product was less than required period.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
                 "shortlisted": "NO"
               }
             ]
           },
           {
             "name": "Tech World Inc",
-            "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
+            "awardedUnits": 0,
+            "shortlistedMembers": "1 / 1 Member Shortlisted this Supplier",
             "answers": {
               "Total price for this product/service": "50000",
               "Do you have data controls?": "Yes"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "John Mark",
+                "role": "Award Nominee",
                 "score": "99%",
                 "comment": "On both projects before this, the supplier has provided the best quality products. Email proof from user included.",
                 "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "28%",
-                "comment": "The delivery charges are too high compared to other suppliers. Not Approved.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "NO"
               }
             ]
           }
@@ -158,6 +136,7 @@ export class AwarderComponent implements OnInit {
       },
       {
         "name": "Water Bottle",
+        "unitCount": 100,
         "generalQuestions": [
           { "category": "Financial", "question": "Total price for this product/service" },
           { "category": "Technical", "question": "Is the bottle BPA-free?" }
@@ -165,94 +144,55 @@ export class AwarderComponent implements OnInit {
         "companies": [
           {
             "name": "Office Hub Ltd",
-            "shortlistedMembers": "2 / 2 Members Shortlisted this Supplier",
+            "awardedUnits": 50,
+            "shortlistedMembers": "1 / 1 Member Shortlisted this Supplier",
             "answers": {
               "Total price for this product/service": "2000",
               "Is the bottle BPA-free?": "Yes"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Janitha Thisara",
+                "role": "Award Nominee",
                 "score": "80%",
                 "comment": "Durable and BPA-free. Good value for money.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "75%",
-                "comment": "Reasonably priced but limited color options.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
                 "shortlisted": "YES"
               }
             ]
           },
           {
             "name": "Supplies Unlimited",
-            "shortlistedMembers": "0 / 2 Members Shortlisted this Supplier",
+            "awardedUnits": 25,
+            "shortlistedMembers": "0 / 1 Member Shortlisted this Supplier",
             "answers": {
               "Total price for this product/service": "2500",
               "Is the bottle BPA-free?": "No"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Isuru Bandara",
+                "role": "Award Nominee",
                 "score": "40%",
                 "comment": "Not BPA-free and overpriced.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "30%",
-                "comment": "Too expensive for the quality offered.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
                 "shortlisted": "NO"
               }
             ]
           },
           {
             "name": "Tech World Inc",
-            "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
+            "awardedUnits": 25,
+            "shortlistedMembers": "1 / 1 Member Shortlisted this Supplier",
             "answers": {
               "Total price for this product/service": "2200",
               "Is the bottle BPA-free?": "Yes"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Gayan Perera",
+                "role": "Award Nominee",
                 "score": "85%",
                 "comment": "Good quality and BPA-free. A bit pricey.",
                 "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "50%",
-                "comment": "Decent product but could be cheaper.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "NO"
               }
             ]
           }
@@ -261,7 +201,7 @@ export class AwarderComponent implements OnInit {
     ]
   }
 
-  rejectproducts = {
+  rejectproducts: RejectedProductsData = {
     "products": [
       {
         "name": "Traditional Laptops",
@@ -269,97 +209,54 @@ export class AwarderComponent implements OnInit {
           { "category": "Financial", "question": "Total price for this product/service" },
           { "category": "Technical", "question": "Do you have data controls?" }
         ],
-        "companies": [
+        "suppliers": [
           {
             "name": "Darren Pvt Ltd",
-            "shortlistedMembers": "2 / 2 Members Shortlisted this Supplier",
             "answers": {
               "Total price for this product/service": "15000",
               "Do you have data controls?": "Yes"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Bukkoj Nazeer",
+                "role": "Pre-Award Nominee",
                 "score": "Not Applicable",
                 "comment": "Ok. Guarantee period and maintenance clause is acceptable.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "Not Applicable",
-                "comment": "On both projects before this, the supplier has provided the best quality products. Email proof from user included.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
                 "shortlisted": "YES"
               }
             ]
           },
           {
             "name": "Supplies Unlimited",
-            "shortlistedMembers": "0 / 2 Members Shortlisted this Supplier",
+
             "answers": {
               "Total price for this product/service": "89000",
               "Do you have data controls?": "No"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Wadhihah Nazeer",
+                "role": "Pre-Award Nominee",
                 "score": "15%",
                 "comment": "Not Short Listed, since the warranty period of the product was less than required period.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "25%",
-                "comment": "Not Short Listed, since the warranty period of the product was less than required period.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
                 "shortlisted": "NO"
               }
             ]
           },
           {
             "name": "Tech World Inc",
-            "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
+
             "answers": {
               "Total price for this product/service": "50000",
               "Do you have data controls?": "Yes"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Donatello Mark",
+                "role": "Pre-Award Nominee",
                 "score": "99%",
                 "comment": "On both projects before this, the supplier has provided the best quality products. Email proof from user included.",
                 "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "28%",
-                "comment": "The delivery charges are too high compared to other suppliers. Not Approved.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "NO"
               }
             ]
           }
@@ -371,97 +268,55 @@ export class AwarderComponent implements OnInit {
           { "category": "Financial", "question": "Total price for this product/service" },
           { "category": "Technical", "question": "Is the bottle BPA-free?" }
         ],
-        "companies": [
+        "suppliers": [
           {
             "name": "Darren Pvt Ltd",
-            "shortlistedMembers": "2 / 2 Members Shortlisted this Supplier",
+
             "answers": {
               "Total price for this product/service": "2000",
               "Is the bottle BPA-free?": "Yes"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Mohamed Shafraz",
+                "role": "Pre-Award Nominee",
                 "score": "80%",
                 "comment": "Durable and BPA-free. Good value for money.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "75%",
-                "comment": "Reasonably priced but limited color options.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
                 "shortlisted": "YES"
               }
             ]
           },
           {
             "name": "Supplies Unlimited",
-            "shortlistedMembers": "0 / 2 Members Shortlisted this Supplier",
+
             "answers": {
               "Total price for this product/service": "2500",
               "Is the bottle BPA-free?": "No"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Naji Sarvanaba",
+                "role": "Pre-Award Nominee",
                 "score": "40%",
                 "comment": "Not BPA-free and overpriced.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "30%",
-                "comment": "Too expensive for the quality offered.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
                 "shortlisted": "NO"
               }
             ]
           },
           {
             "name": "Tech World Inc",
-            "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
+
             "answers": {
               "Total price for this product/service": "2200",
               "Is the bottle BPA-free?": "Yes"
             },
             "committeeMembers": [
               {
-                "name": "Dinusha Hewage",
-                "role": "Member",
+                "name": "Hewage Danushka",
+                "role": "Pre-Award Nominee",
                 "score": "85%",
                 "comment": "Good quality and BPA-free. A bit pricey.",
                 "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "50%",
-                "comment": "Decent product but could be cheaper.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "NO"
               }
             ]
           }
@@ -506,19 +361,19 @@ export class AwarderComponent implements OnInit {
   }
 
   highlightLowestPriceRejected() {
-    this.rejectproducts.products.forEach((product: Product) => {
+    this.rejectproducts.products.forEach((product: RejectedProduct) => {
       let lowestPrice = Infinity;
       const lowestPriceQuestion = "Total price for this product/service";
 
-      product.companies.forEach((company: Company) => {
-        const price = parseFloat(company.answers[lowestPriceQuestion] as string);
+      product.suppliers.forEach((supplier: RejectedSupplier) => {
+        const price = parseFloat(supplier.answers[lowestPriceQuestion] as string);
         if (price < lowestPrice) {
           lowestPrice = price;
         }
       });
 
-      product.companies.forEach((company: Company) => {
-        company.isLowestPrice = parseFloat(company.answers[lowestPriceQuestion] as string) === lowestPrice;
+      product.suppliers.forEach((supplier: RejectedSupplier) => {
+        (supplier as any).isLowestPrice = parseFloat(supplier.answers[lowestPriceQuestion] as string) === lowestPrice;
       });
     });
   }
@@ -592,7 +447,7 @@ export class AwarderComponent implements OnInit {
     worksheet.getColumn(1).width = 20;
     worksheet.getColumn(2).width = 69;
     for (let i = 3; i <= 60; i++) {
-      worksheet.getColumn(i).width = 42;
+      worksheet.getColumn(i).width = 70;
     }
 
     const emptyRow = worksheet.addRow([]);
@@ -622,39 +477,30 @@ export class AwarderComponent implements OnInit {
     this.shortlistedproducts.products.forEach((product: Product, productIndex: number) => {
       const productHeaderRow = worksheet.addRow([
         '',
-        product.name,
-        ...product.companies.reduce((acc: string[], c: Company) => acc.concat(['', c.name, '']), [])
+        `${product.name} (${product.unitCount} units)`,
+        ...product.companies.map(c => c.name)
       ]);
       this.styleHeaderRow(productHeaderRow);
-      product.companies.forEach((_, index: number) => {
-        worksheet.mergeCells(startRow + productIndex * (product.generalQuestions.length + 5) + 1, index * 3 + 3, startRow + productIndex * (product.generalQuestions.length + 5) + 1, index * 3 + 5);
-      });
 
       const shortlistedRow = worksheet.addRow([
         '',
-        'Product Question ↓',
-        ...product.companies.reduce((acc: string[], c: Company) => acc.concat([c.shortlistedMembers, '', '']), [])
+        'Awarded Units',
+        ...product.companies.map(c => `${c.awardedUnits} / ${product.unitCount} units`)
       ]);
-      product.companies.forEach((_, index: number) => {
-        worksheet.mergeCells(shortlistedRow.number, index * 3 + 3, shortlistedRow.number, index * 3 + 5);
-      });
 
       product.generalQuestions.forEach(question => {
         const row = worksheet.addRow([
           question.category,
           question.question,
-          ...product.companies.reduce((acc: string[], company: Company) => acc.concat([company.answers[question.question] as string, '', '']), [])
+          ...product.companies.map(company => company.answers[question.question] as string)
         ]);
         this.styleCategoryCell(row.getCell(1));
-        product.companies.forEach((_, index: number) => {
-          worksheet.mergeCells(row.number, index * 3 + 3, row.number, index * 3 + 5);
-        });
 
         if (question.question === 'Total price for this product/service') {
           const prices = product.companies.map(company => parseFloat(company.answers[question.question] as string));
           const lowestPrice = Math.min(...prices);
           row.eachCell((cell, colNumber) => {
-            if (colNumber > 2 && colNumber % 3 === 0 && parseFloat(cell.value as string) === lowestPrice) {
+            if (colNumber > 2 && parseFloat(cell.value as string) === lowestPrice) {
               cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -669,10 +515,12 @@ export class AwarderComponent implements OnInit {
         const row = worksheet.addRow([
           '',
           category,
-          ...product.companies.reduce((acc: string[], company: Company) =>
-            acc.concat(company.committeeMembers.map(member =>
-              category === 'Committee Member' ? `${member.name} (${member.role})` : (member[category.toLowerCase()] || '')
-            )), [])
+          ...product.companies.map(company => {
+            const committeeMember = company.committeeMembers[0];
+            return category === 'Committee Member'
+              ? `${committeeMember.name} (${committeeMember.role})`
+              : (committeeMember[category.toLowerCase()] || '');
+          })
         ]);
         row.getCell(2).font = { bold: true };
       });
@@ -690,44 +538,33 @@ export class AwarderComponent implements OnInit {
 
     startRow++;
 
-    this.rejectproducts.products.forEach((product: Product, productIndex: number) => {
+    this.rejectproducts.products.forEach((product: RejectedProduct, productIndex: number) => {
       const productHeaderRow = worksheet.addRow([
         '',
         product.name,
-        ...product.companies.reduce((acc: string[], c: Company) => acc.concat([c.name, c.name, c.name]), [])
+        ...product.suppliers.map(s => s.name)
       ]);
       this.styleHeaderRow(productHeaderRow);
-      product.companies.forEach((_, index: number) => {
-        worksheet.mergeCells(productHeaderRow.number, index * 3 + 3, productHeaderRow.number, index * 3 + 5);
-        const mergedCell = worksheet.getCell(productHeaderRow.number, index * 3 + 3);
-        mergedCell.alignment = { horizontal: 'center', vertical: 'middle' };
-      });
 
       const rejectedRow = worksheet.addRow([
         '',
         'Product Question ↓',
-        ...product.companies.reduce((acc: string[], c: Company) => acc.concat([c.shortlistedMembers, '', '']), [])
+        ...product.suppliers.map(() => 'Rejected')
       ]);
-      product.companies.forEach((_, index: number) => {
-        worksheet.mergeCells(rejectedRow.number, index * 3 + 3, rejectedRow.number, index * 3 + 5);
-      });
 
       product.generalQuestions.forEach(question => {
         const row = worksheet.addRow([
           question.category,
           question.question,
-          ...product.companies.reduce((acc: string[], company: Company) => acc.concat([company.answers[question.question] as string, '', '']), [])
+          ...product.suppliers.map(supplier => supplier.answers[question.question] as string)
         ]);
         this.styleCategoryCell(row.getCell(1));
-        product.companies.forEach((_, index: number) => {
-          worksheet.mergeCells(row.number, index * 3 + 3, row.number, index * 3 + 5);
-        });
 
         if (question.question === 'Total price for this product/service') {
-          const prices = product.companies.map(company => parseFloat(company.answers[question.question] as string));
+          const prices = product.suppliers.map(supplier => parseFloat(supplier.answers[question.question] as string));
           const lowestPrice = Math.min(...prices);
           row.eachCell((cell, colNumber) => {
-            if (colNumber > 2 && colNumber % 3 === 0 && parseFloat(cell.value as string) === lowestPrice) {
+            if (colNumber > 2 && parseFloat(cell.value as string) === lowestPrice) {
               cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -742,10 +579,12 @@ export class AwarderComponent implements OnInit {
         const row = worksheet.addRow([
           '',
           category,
-          ...product.companies.reduce((acc: string[], company: Company) =>
-            acc.concat(company.committeeMembers.map(member =>
-              category === 'Committee Member' ? `${member.name} (${member.role})` : (member[category.toLowerCase()] || '')
-            )), [])
+          ...product.suppliers.map(supplier => {
+            const committeeMember = supplier.committeeMembers[0];
+            return category === 'Committee Member'
+              ? `${committeeMember.name} (${committeeMember.role})`
+              : (committeeMember[category.toLowerCase()] || '');
+          })
         ]);
         row.getCell(2).font = { bold: true };
       });
