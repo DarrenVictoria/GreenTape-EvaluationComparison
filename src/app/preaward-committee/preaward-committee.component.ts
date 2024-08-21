@@ -437,14 +437,14 @@ export class PreawardCommitteeComponent implements OnInit {
       let lowestPrice = Infinity;
       const lowestPriceQuestion = "Total price for this product/service";
 
-      product.companies.forEach(company => {
+      (product.companies as any).forEach(company => {
         const price = parseFloat(company.answers[lowestPriceQuestion] as string);
         if (price < lowestPrice) {
           lowestPrice = price;
         }
       });
 
-      product.companies.forEach(company => {
+      (product.companies as any).forEach(company => {
         (company as any).isLowestPrice = parseFloat(company.answers[lowestPriceQuestion] as string) === lowestPrice;
       });
     });
