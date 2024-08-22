@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BidData } from '../models/bid-comparison-model';
+import { BidData } from '../models/bid-comparison.model';
 
 @Injectable()
 
