@@ -2,21 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import * as ExcelJS from 'exceljs';
 import * as FileSaver from 'file-saver';
 
-interface TenderDetails {
-  TenderID: string;
-  TenderName: string;
-  TenderModel: string;
-  CreatedBy: string;
-  CreatedOn: string;
-  InvitedParticipants: number;
-  Participated: number;
-  NotSubmitted: number;
-  RejectedTender: number;
-  RroductCount: number;
-  CommitteeMembers: number;
-  CompletedDate: string;
-}
-
 interface GeneralQuestion {
   category: string;
   question: string;
@@ -38,7 +23,6 @@ interface Company {
 }
 
 interface BidData {
-  tenderDetails: TenderDetails;
   generalQuestions: GeneralQuestion[];
   companies: Company[];
 }
@@ -60,20 +44,6 @@ export class PreawardCommitteeComponent implements OnInit {
   companyAvgScores: number[] = [];
 
   bidData: BidData = {
-    "tenderDetails": {
-      "TenderID": "HAY-7-TEN-61",
-      "TenderName": "TEN#301 - Supply of Office Supplies",
-      "TenderModel": "RFP (Request for Proposal)",
-      "CreatedBy": "Hayleys Advantis | info@affnohayleys.lk",
-      "CreatedOn": "01/10/2021 : 10:15:00 AM",
-      "InvitedParticipants": 15,
-      "Participated": 12,
-      "NotSubmitted": 2,
-      "RejectedTender": 1,
-      "RroductCount": 18,
-      "CommitteeMembers": 3,
-      "CompletedDate": "20/10/2021 15:00"
-    },
     "generalQuestions": [
       { "category": "Company Information", "question": "How long has your company been in business?" },
       { "category": "Services", "question": "What warranty do you offer on your products?" },

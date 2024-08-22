@@ -51,22 +51,7 @@ export class AwarderComponent implements OnInit {
   companyTotals: number[];
   companyAvgScores: number[];
 
-  bidData = {
-    "tenderDetails": {
-      "TenderID": "HAY-7-TEN-61",
-      "TenderName": "TEN#301 - Supply of Office Supplies",
-      "TenderModel": "RFP (Request for Proposal)",
-      "CreatedBy": "Hayleys Advantis | info@affnohayleys.lk",
-      "CreatedOn": "01/10/2021 : 10:15:00 AM",
-      "InvitedParticipants": 15,
-      "Participated": 12,
-      "NotSubmitted": 2,
-      "RejectedTender": 1,
-      "RroductCount": 18,
-      "CommitteeMembers": 1,
-      "CompletedDate": "20/10/2021 15:00"
-    },
-  };
+
 
   shortlistedproducts = {
     "products": [

@@ -1,10 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
-//Data Service here
+import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
+
+
 
 import { AppComponent } from './app.component';
 import { EvaluationComparisonTabsComponent } from './evaluation-comparison-tabs/evaluation-comparison-tabs.component';
@@ -16,14 +17,14 @@ import { ScoreSheetComponent } from './score-sheet/score-sheet.component';
 import { PreawardCommitteeComponent } from './preaward-committee/preaward-committee.component';
 import { ShortlistCommittee2Component } from './shortlist-committee-2/shortlist-committee-2.component';
 
+import { InMemoryDataService } from './services/in-memory-data.service';
+import { BidComparisonDataService } from './services/bid-comparison-data.service';
+import { BidComparisonConvertorService } from './convertors/bid-comparison-convertor.service';
+
 
 const routes: Routes = [
   { path: '', component: EvaluationComparisonTabsComponent },
-
-
 ];
-
-
 
 @NgModule({
   declarations: [
@@ -36,19 +37,19 @@ const routes: Routes = [
     ScoreSheetComponent,
     PreawardCommitteeComponent,
     ShortlistCommittee2Component,
-
-
-
   ],
   imports: [
     BrowserModule,
     RouterModule.forRoot(routes),
-    // HttpClientModule,
-    // HttpClientInMemoryWebApiModule.forRoot(
-    //   InMemoryDataService, { dataEncapsulation: false }
-    // )
+    HttpClientModule,
+    InMemoryWebApiModule.forRoot(InMemoryDataService, { dataEncapsulation: false })
+
   ],
-  providers: [],   //Add here InMemoryDataService
+  providers: [
+    InMemoryDataService,
+    BidComparisonDataService,
+    BidComparisonConvertorService
+  ],   //Add here InMemoryDataService
   bootstrap: [AppComponent]
 })
 export class AppModule { }
