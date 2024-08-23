@@ -1,6 +1,5 @@
 <div class="score-sheet-container">
-
-  <ng-container *ngFor="let committee of committees; let committeeIndex = index">
+  <ng-container *ngFor="let committee of scoreSheetData.committees; let committeeIndex = index">
     <h2>{{ committee.name }}</h2>
     <p><strong>Score Range:</strong> {{ committee.scoreRange.start }} - {{ committee.scoreRange.end }}</p>
 
@@ -45,7 +44,7 @@
                 </td>
                 <td class="weights-column">
                   <div *ngFor="let question of section.questions" class="question-row">
-                    <span class="weight-text">{{ question.weight }}</span>
+                    <span class="weight-text">{{ question.weight }}%</span>
                   </div>
                 </td>
                 <ng-container *ngFor="let supplier of member.suppliers">

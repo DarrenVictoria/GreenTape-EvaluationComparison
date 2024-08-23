@@ -21,6 +21,19 @@ import { InMemoryDataService } from './services/in-memory-data.service';
 import { BidComparisonDataService } from './services/bid-comparison-data.service';
 import { BidComparisonConvertorService } from './convertors/bid-comparison-convertor.service';
 
+import { ShortlistCommitteeConvertorService } from './convertors/shortlist-committee-convertor.service';
+import { ShortlistCommitteeService } from './services/shortlist-committee.service';
+import { AwarderConvertorService } from './convertors/awarder-convetor.service';
+import { AwarderService } from './services/awarder.service';
+import { ShortlistCommittee2ConvertorService } from './convertors/shortlist-committee-2-convertor.service';
+import { ShortlistCommittee2Service } from './services/shortlist-committee2.service';
+import { PreAwardCommitteeService } from './services/preaward-committee.service';
+import { PreAwardCommitteeConvertorService } from './convertors/preaward-committee-convertor.service';
+import { ScoreSheetService } from './services/score-sheet.service';
+import { ScoreSheetConverterService } from './convertors/score-sheet-convertor.service';
+import { TenderDetailsService } from './services/tender-details.service';
+import { TenderDetailsConverterService } from './convertors/tender-details-convertor.service';
+
 
 const routes: Routes = [
   { path: '', component: EvaluationComparisonTabsComponent },
@@ -42,13 +55,26 @@ const routes: Routes = [
     BrowserModule,
     RouterModule.forRoot(routes),
     HttpClientModule,
-    InMemoryWebApiModule.forRoot(InMemoryDataService, { dataEncapsulation: false })
+    InMemoryWebApiModule.forRoot(InMemoryDataService, { dataEncapsulation: false }),
+    HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, { dataEncapsulation: false })
 
   ],
   providers: [
     InMemoryDataService,
     BidComparisonDataService,
-    BidComparisonConvertorService
+    BidComparisonConvertorService,
+    ShortlistCommitteeConvertorService,
+    ShortlistCommitteeService,
+    AwarderConvertorService,
+    AwarderService,
+    ShortlistCommittee2ConvertorService,
+    ShortlistCommittee2Service,
+    PreAwardCommitteeService,
+    PreAwardCommitteeConvertorService,
+    ScoreSheetService,
+    ScoreSheetConverterService,
+    TenderDetailsService,
+    TenderDetailsConverterService
   ],   //Add here InMemoryDataService
   bootstrap: [AppComponent]
 })

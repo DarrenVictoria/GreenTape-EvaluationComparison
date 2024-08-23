@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { BidData } from '../models/bid-comparison-model';
+import { BidData } from '../models/bid-comparison.model';
 import { BidComparisonConvertorService } from '../convertors/bid-comparison-convertor.service';
 
 @Injectable()

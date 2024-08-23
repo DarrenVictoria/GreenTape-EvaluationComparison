@@ -1,73 +1,71 @@
 <div class="shortlist-committee-container">
-
   <h2>General Questions</h2>
-  <table>
+  <table *ngIf="data">
     <thead>
       <tr>
         <th>Category</th>
         <th>General Questions</th>
-        <th colspan="3" *ngFor="let company of bidData.companies">{{ company.name }}</th>
+        <th colspan="3" *ngFor="let company of data.companies">{{ company.name }}</th>
       </tr>
       <tr>
         <td colspan="2">Number of Members Shortlisted</td>
-        <td colspan="3" *ngFor="let company of bidData.companies">
+        <td colspan="3" *ngFor="let company of data.companies">
           {{ company.shortlistedMembers }}
         </td>
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngFor="let question of bidData.generalQuestions">
+      <ng-container *ngFor="let question of data.generalQuestions">
         <tr>
           <td>{{ question.category }}</td>
           <td>{{ question.question }}</td>
-          <td colspan="3" *ngFor="let company of bidData.companies">
+          <td colspan="3" *ngFor="let company of data.companies">
             {{ company.answers[question.question] }}
           </td>
         </tr>
       </ng-container>
       <tr>
         <td colspan="2">Committee Member</td>
-        <ng-container *ngFor="let company of bidData.companies">
-          <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-            <td>{{ member?.name }} ({{ member?.role }})</td>
-          </ng-container>
+        <ng-container *ngFor="let company of data.companies">
+          <td *ngFor="let member of company.committeeMembers">
+            {{ member.name }} ({{ member.role }})
+          </td>
         </ng-container>
       </tr>
-
       <tr>
         <td colspan="2">Score</td>
-        <ng-container *ngFor="let company of bidData.companies">
-          <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-            <td>{{ member?.score }}</td>
-          </ng-container>
+        <ng-container *ngFor="let company of data.companies">
+          <td *ngFor="let member of company.committeeMembers">
+            {{ member.score }}
+          </td>
         </ng-container>
       </tr>
       <tr>
         <td colspan="2">Comment</td>
-        <ng-container *ngFor="let company of bidData.companies">
-          <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-            <td>{{ member?.comment }}</td>
-          </ng-container>
+        <ng-container *ngFor="let company of data.companies">
+          <td *ngFor="let member of company.committeeMembers">
+            {{ member.comment }}
+          </td>
         </ng-container>
       </tr>
       <tr>
         <td colspan="2">Shortlisted</td>
-        <ng-container *ngFor="let company of bidData.companies">
-          <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-            <td>{{ member?.shortlisted ? 'Yes' : 'No' }}</td>
-          </ng-container>
+        <ng-container *ngFor="let company of data.companies">
+          <td *ngFor="let member of company.committeeMembers">
+            {{ member.shortlisted }}
+          </td>
         </ng-container>
       </tr>
       <tr>
         <td colspan="2">Average Score</td>
-        <td colspan="3" *ngFor="let company of bidData.companies">
+        <td colspan="3" *ngFor="let company of data.companies">
           {{ calculateAverageScore(company) }}
         </td>
       </tr>
     </tbody>
   </table>
 
-  <div *ngFor="let product of products.products">
+  <div *ngFor="let product of data?.products">
     <h2>{{ product.name }}</h2>
     <table>
       <thead>
@@ -88,73 +86,66 @@
           <tr>
             <td>{{ question.category }}</td>
             <td>{{ question.question }}</td>
-            <td
+            <td colspan="3"
               [ngClass]="{'lowest-price': company.isLowestPrice && question.question === 'Total price for this product/service'}"
-              colspan="3" *ngFor="let company of product.companies">
+              *ngFor="let company of product.companies">
               {{ company.answers[question.question] }}
-
             </td>
           </tr>
         </ng-container>
         <tr>
           <td colspan="2">Committee Member</td>
           <ng-container *ngFor="let company of product.companies">
-            <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-              <td>{{ member?.name }} ({{ member?.role }})</td>
-            </ng-container>
+            <td *ngFor="let member of company.committeeMembers">
+              {{ member.name }} ({{ member.role }})
+            </td>
           </ng-container>
         </tr>
-
         <tr>
           <td colspan="2">Score</td>
           <ng-container *ngFor="let company of product.companies">
-            <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-              <td>{{ member?.score }}</td>
-            </ng-container>
+            <td *ngFor="let member of company.committeeMembers">
+              {{ member.score }}
+            </td>
           </ng-container>
         </tr>
         <tr>
           <td colspan="2">Comment</td>
           <ng-container *ngFor="let company of product.companies">
-            <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-              <td>{{ member?.comment }}</td>
-            </ng-container>
+            <td *ngFor="let member of company.committeeMembers">
+              {{ member.comment }}
+            </td>
           </ng-container>
         </tr>
         <tr>
           <td colspan="2">Shortlisted</td>
           <ng-container *ngFor="let company of product.companies">
-            <ng-container *ngFor="let member of company.committeeMembers; let i = index">
-              <td>{{ member?.shortlisted ? 'Yes' : 'No' }}</td>
-            </ng-container>
+            <td *ngFor="let member of company.committeeMembers">
+              {{ member.shortlisted }}
+            </td>
           </ng-container>
         </tr>
-
       </tbody>
     </table>
   </div>
 
-  <table>
+  <table *ngIf="data">
     <thead>
       <tr>
-        <!-- First empty header cell -->
         <th></th>
-        <!-- Company Name Headers with green styling -->
-        <th *ngFor="let company of bidData.companies" style="background-color: green; color: white;">
+        <th *ngFor="let company of data.companies" style="background-color: green; color: white;">
           {{ company.name }}
         </th>
       </tr>
     </thead>
     <tbody>
-      <!-- Total Quoted Row -->
       <tr>
         <td>Total Quoted</td>
-        <td *ngFor="let total of companyTotals" [ngClass]="{'lowest-price': isLowestPrice(total, companyTotals)}">
+        <td *ngFor="let total of companyTotals; let i = index"
+          [ngClass]="{'lowest-price': isLowestPrice(total, companyTotals)}">
           {{ total | number:'1.0-0' }}
         </td>
       </tr>
-
-      <!-- Avg Score % Row -->
       <tr>
         <td>Avg Score %</td>
         <td *ngFor="let score of companyAvgScores">
@@ -163,11 +154,4 @@
       </tr>
     </tbody>
   </table>
-
-
-
-
-
-
-
 </div>

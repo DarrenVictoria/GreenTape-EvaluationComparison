@@ -1,54 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import * as ExcelJS from 'exceljs';
 import * as FileSaver from 'file-saver';
-
-interface TenderDetails {
-  TenderID: string;
-  TenderName: string;
-  TenderModel: string;
-  CreatedBy: string;
-  CreatedOn: string;
-  InvitedParticipants: number;
-  Participated: number;
-  NotSubmitted: number;
-  RejectedTender: number;
-  RroductCount: number;
-  CommitteeMembers: number;
-  CompletedDate: string;
-}
-
-interface GeneralQuestion {
-  category: string;
-  question: string;
-}
-
-interface CommitteeMember {
-  name: string;
-  role: string;
-  score: string;
-  comment: string;
-  shortlisted: string;
-}
-
-interface Company {
-  name: string;
-  shortlistedMembers: string;
-  answers: { [key: string]: string };
-  committeeMembers: CommitteeMember[];
-}
-
-interface BidData {
-  tenderDetails: TenderDetails;
-  generalQuestions: GeneralQuestion[];
-  companies: Company[];
-}
-
-interface Product {
-  name: string;
-  generalQuestions: { category: string; question: string }[];
-  companies: Company[];
-}
-
+import { ShortlistCommitteeService } from '../services/shortlist-committee.service';
+import { ShortlistCommitteeConvertorService } from '../convertors/shortlist-committee-convertor.service';
+import { ShortlistCommitteeData, Company, Product } from '../models/shortlist-committee.model';
 
 @Component({
   selector: 'app-shortlist-committee',
@@ -56,384 +11,69 @@ interface Product {
   styleUrls: ['./shortlist-committee.component.css']
 })
 export class ShortlistCommitteeComponent implements OnInit {
+  data: ShortlistCommitteeData | null = null;
   companyTotals: number[] = [];
   companyAvgScores: number[] = [];
 
-  bidData: BidData = {
-    "tenderDetails": {
-      "TenderID": "HAY-7-TEN-61",
-      "TenderName": "TEN#301 - Supply of Office Supplies",
-      "TenderModel": "RFP (Request for Proposal)",
-      "CreatedBy": "Hayleys Advantis | info@affnohayleys.lk",
-      "CreatedOn": "01/10/2021 : 10:15:00 AM",
-      "InvitedParticipants": 15,
-      "Participated": 12,
-      "NotSubmitted": 2,
-      "RejectedTender": 1,
-      "RroductCount": 18,
-      "CommitteeMembers": 3,
-      "CompletedDate": "20/10/2021 15:00"
-    },
-    "generalQuestions": [
-      { "category": "Company Information", "question": "How long has your company been in business?" },
-      { "category": "Services", "question": "What warranty do you offer on your products?" },
-      { "category": "Support", "question": "Do you provide technical support 24/7?" }
-    ],
-    "companies": [
-      {
-        "name": "Office Hub Ltd",
-        "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
-        "answers": {
-          "How long has your company been in business?": "10 years",
-          "What warranty do you offer on your products?": "2 years",
-          "Do you provide technical support 24/7?": "Yes, phone and email support available."
-        },
-        "committeeMembers": [
-          {
-            "name": "Dinusha Hewage",
-            "role": "Member",
-            "score": "85%",
-            "comment": "Reliable and well-established company.",
-            "shortlisted": "YES"
-          },
-          {
-            "name": "Aaliyah Mohamed",
-            "role": "Member",
-            "score": "75%",
-            "comment": "Good warranty terms, but higher pricing.",
-            "shortlisted": "YES"
-          },
-          {
-            "name": "Daniel Perera",
-            "role": "Nominee",
-            "score": "Not Applicable",
-            "comment": "Good warranty terms, but higher pricing.",
-            "shortlisted": "YES"
-          }
-        ]
-      },
-      {
-        "name": "Supplies Unlimited",
-        "shortlistedMembers": "0 / 2 Members Shortlisted this Supplier",
-        "answers": {
-          "How long has your company been in business?": "5 years",
-          "What warranty do you offer on your products?": "1 year",
-          "Do you provide technical support 24/7?": "No, only during business hours."
-        },
-        "committeeMembers": [
-          {
-            "name": "Dinusha Hewage",
-            "role": "Member",
-            "score": "65%",
-            "comment": "Limited warranty and support.",
-            "shortlisted": "NO"
-          },
-          {
-            "name": "Aaliyah Mohamed",
-            "role": "Member",
-            "score": "60%",
-            "comment": "New company with less experience.",
-            "shortlisted": "NO"
-          },
-          {
-            "name": "Daniel Perera",
-            "role": "Nominee",
-            "score": "Not Applicable",
-            "comment": "New company with less experience.",
-            "shortlisted": "NO"
-          }
-        ]
-      },
-      {
-        "name": "Tech World Inc",
-        "shortlistedMembers": "2 / 2 Members Shortlisted this Supplier",
-        "answers": {
-          "How long has your company been in business?": "20 years",
-          "What warranty do you offer on your products?": "3 years",
-          "Do you provide technical support 24/7?": "Yes, 24/7 phone support."
-        },
-        "committeeMembers": [
-          {
-            "name": "Dinusha Hewage",
-            "role": "Member",
-            "score": "90%",
-            "comment": "Long-standing company with excellent support.",
-            "shortlisted": "YES"
-          },
-          {
-            "name": "Aaliyah Mohamed",
-            "role": "Member",
-            "score": "85%",
-            "comment": "Great warranty and support.",
-            "shortlisted": "YES"
-          },
-          {
-            "name": "Daniel Perera",
-            "role": "Nominee",
-            "score": "Not Applicable",
-            "comment": "New company with less experience.",
-            "shortlisted": "NO"
-          }
-        ]
-      }
-    ],
-
-  };
-
-  products = {
-    "products": [
-      {
-        "name": "Traditional Laptops",
-        "generalQuestions": [
-          { "category": "Financial", "question": "Total price for this product/service" },
-          { "category": "Technical", "question": "Do you have data controls?" }
-        ],
-        "companies": [
-          {
-            "name": "Office Hub Ltd",
-            "shortlistedMembers": "2 / 2 Members Shortlisted this Supplier",
-            "answers": {
-              "Total price for this product/service": "15000",
-              "Do you have data controls?": "Yes"
-            },
-            "committeeMembers": [
-              {
-                "name": "Dinusha Hewage",
-                "role": "Member",
-                "score": "66%",
-                "comment": "Ok. Guarantee period and maintenance clause is acceptable.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "81%",
-                "comment": "On both projects before this, the supplier has provided the best quality products. Email proof from user included.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "YES"
-              }
-            ]
-          },
-          {
-            "name": "Supplies Unlimited",
-            "shortlistedMembers": "0 / 2 Members Shortlisted this Supplier",
-            "answers": {
-              "Total price for this product/service": "89000",
-              "Do you have data controls?": "No"
-            },
-            "committeeMembers": [
-              {
-                "name": "Dinusha Hewage",
-                "role": "Member",
-                "score": "15%",
-                "comment": "Not Short Listed, since the warranty period of the product was less than required period.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "25%",
-                "comment": "Not Short Listed, since the warranty period of the product was less than required period.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "NO"
-              }
-            ]
-          },
-          {
-            "name": "Tech World Inc",
-            "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
-            "answers": {
-              "Total price for this product/service": "50000",
-              "Do you have data controls?": "Yes"
-            },
-            "committeeMembers": [
-              {
-                "name": "Dinusha Hewage",
-                "role": "Member",
-                "score": "99%",
-                "comment": "On both projects before this, the supplier has provided the best quality products. Email proof from user included.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "28%",
-                "comment": "The delivery charges are too high compared to other suppliers. Not Approved.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "NO"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "Water Bottle",
-        "generalQuestions": [
-          { "category": "Financial", "question": "Total price for this product/service" },
-          { "category": "Technical", "question": "Is the bottle BPA-free?" }
-        ],
-        "companies": [
-          {
-            "name": "Office Hub Ltd",
-            "shortlistedMembers": "2 / 2 Members Shortlisted this Supplier",
-            "answers": {
-              "Total price for this product/service": "2000",
-              "Is the bottle BPA-free?": "Yes"
-            },
-            "committeeMembers": [
-              {
-                "name": "Dinusha Hewage",
-                "role": "Member",
-                "score": "80%",
-                "comment": "Durable and BPA-free. Good value for money.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "75%",
-                "comment": "Reasonably priced but limited color options.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "YES"
-              }
-            ]
-          },
-          {
-            "name": "Supplies Unlimited",
-            "shortlistedMembers": "0 / 2 Members Shortlisted this Supplier",
-            "answers": {
-              "Total price for this product/service": "2500",
-              "Is the bottle BPA-free?": "No"
-            },
-            "committeeMembers": [
-              {
-                "name": "Dinusha Hewage",
-                "role": "Member",
-                "score": "40%",
-                "comment": "Not BPA-free and overpriced.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "30%",
-                "comment": "Too expensive for the quality offered.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "NO"
-              }
-            ]
-          },
-          {
-            "name": "Tech World Inc",
-            "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
-            "answers": {
-              "Total price for this product/service": "2200",
-              "Is the bottle BPA-free?": "Yes"
-            },
-            "committeeMembers": [
-              {
-                "name": "Dinusha Hewage",
-                "role": "Member",
-                "score": "85%",
-                "comment": "Good quality and BPA-free. A bit pricey.",
-                "shortlisted": "YES"
-              },
-              {
-                "name": "Aaliyah Mohamed",
-                "role": "Member",
-                "score": "50%",
-                "comment": "Decent product but could be cheaper.",
-                "shortlisted": "NO"
-              },
-              {
-                "name": "Daniel Perera",
-                "role": "Nominee",
-                "score": "Not Applicable",
-                "comment": "Lorem ipsum thought about it",
-                "shortlisted": "NO"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-
-  constructor() { }
+  constructor(
+    private shortlistCommitteeService: ShortlistCommitteeService,
+    private convertorService: ShortlistCommitteeConvertorService
+  ) { }
 
   ngOnInit(): void {
-    this.calculateCompanyTotals();
-    this.calculateCompanyAvgScores();
-    this.highlightLowestPrice();
+    this.loadData();
   }
 
-  calculateCompanyTotals(): void {
-    this.companyTotals = this.bidData.companies.map((company: Company) => {
-      return this.products.products.reduce((total: number, product: Product) => {
-        const companyProduct = product.companies.find(c => c.name === company.name);
-        return total + (companyProduct ? parseFloat(companyProduct.answers['Total price for this product/service'] || '0') : 0);
-      }, 0);
-    });
+  loadData(): void {
+    this.shortlistCommitteeService.getShortlistCommitteeData().subscribe(
+      (data: ShortlistCommitteeData) => {
+        this.data = data;
+        this.companyTotals = this.convertorService.calculateCompanyTotals(this.data);
+        this.companyAvgScores = this.convertorService.calculateCompanyAvgScores(this.data);
+      },
+      error => {
+        console.error('Error loading shortlist committee data:', error);
+        // You can add more detailed error handling here
+      }
+    );
   }
+  // calculateCompanyTotals(): void {
+  //   this.companyTotals = this.data.companies.map((company: Company) => {
+  //     return this.data.products.reduce((total: number, product: Product) => {
+  //       const companyProduct = product.companies.find(c => c.name === company.name);
+  //       return total + (companyProduct ? parseFloat(companyProduct.answers['Total price for this product/service'] || '0') : 0);
+  //     }, 0);
+  //   });
+  // }
 
-  calculateCompanyAvgScores(): void {
-    if (this.products.products.length === 0 || this.products.products[0].companies.length === 0) {
-      this.companyAvgScores = [];
-      return;
-    }
+  // calculateCompanyAvgScores(): void {
+  //   if (this.data.products.length === 0 || this.data.products[0].companies.length === 0) {
+  //     this.companyAvgScores = [];
+  //     return;
+  //   }
 
-    const initialScores = new Array(this.products.products[0].companies.length).fill(0);
+  //   const initialScores = new Array(this.data.products[0].companies.length).fill(0);
 
-    this.companyAvgScores = this.products.products.reduce((acc: number[], product: Product) => {
-      const productScores = product.companies.map(company => {
-        const validScores = company.committeeMembers
-          .map(member => parseFloat(member.score))
-          .filter(score => !isNaN(score) && score > 0);
+  //   this.companyAvgScores = this.data.products.reduce((acc: number[], product: Product) => {
+  //     const productScores = product.companies.map(company => {
+  //       const validScores = company.committeeMembers
+  //         .map(member => parseFloat(member.score))
+  //         .filter(score => !isNaN(score) && score > 0);
 
-        return validScores.length > 0
-          ? validScores.reduce((a, b) => a + b) / validScores.length
-          : 0;
-      });
+  //       return validScores.length > 0
+  //         ? validScores.reduce((a, b) => a + b) / validScores.length
+  //         : 0;
+  //     });
 
-      return acc.map((sum, idx) => sum + productScores[idx]);
-    }, initialScores);
+  //     return acc.map((sum, idx) => sum + productScores[idx]);
+  //   }, initialScores);
 
-    const productCount = this.products.products.length;
-    this.companyAvgScores = this.companyAvgScores.map(totalScore => totalScore / productCount);
-  }
+  //   const productCount = this.data.products.length;
+  //   this.companyAvgScores = this.companyAvgScores.map(totalScore => totalScore / productCount);
+  // }
 
   highlightLowestPrice(): void {
-    this.products.products.forEach(product => {
+    this.data.products.forEach(product => {
       let lowestPrice = Infinity;
       const lowestPriceQuestion = "Total price for this product/service";
 
@@ -486,6 +126,10 @@ export class ShortlistCommitteeComponent implements OnInit {
   }
 
   async getWorksheet(): Promise<ExcelJS.Worksheet> {
+    if (!this.data) {
+      throw new Error('Data not loaded');
+    }
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Shortlist Committee');
 
@@ -504,7 +148,7 @@ export class ShortlistCommitteeComponent implements OnInit {
 
     currentRow = await this.addGeneralQuestionsTable(worksheet, currentRow);
 
-    for (const product of this.products.products) {
+    for (const product of this.data.products) {
       worksheet.addRow([]);
       worksheet.addRow([]);
       currentRow += 2;
@@ -520,6 +164,7 @@ export class ShortlistCommitteeComponent implements OnInit {
 
     return worksheet;
   }
+
 
   styleHeaderRow(row: ExcelJS.Row) {
     row.eachCell((cell, colNumber) => {
@@ -575,31 +220,31 @@ export class ShortlistCommitteeComponent implements OnInit {
     const headerRow = worksheet.addRow([
       '',
       'General Questions',
-      ...this.bidData.companies.reduce((acc: string[], c: Company) => acc.concat(['', c.name, '']), [])
+      ...this.data.companies.reduce((acc: string[], c: Company) => acc.concat(['', c.name, '']), [])
     ]);
     this.styleHeaderRow(headerRow);
-    this.bidData.companies.forEach((_, index) => {
+    this.data.companies.forEach((_, index) => {
       worksheet.mergeCells(startRow + 1, index * 3 + 3, startRow + 1, index * 3 + 5);
     });
 
     const shortlistedRow = worksheet.addRow([
       '',
       '',
-      ...this.bidData.companies.reduce((acc: string[], c: Company) => acc.concat([c.shortlistedMembers, '', '']), [])
+      ...this.data.companies.reduce((acc: string[], c: Company) => acc.concat([c.shortlistedMembers, '', '']), [])
     ]);
     shortlistedRow.getCell(1).font = { bold: true };
-    this.bidData.companies.forEach((_, index) => {
+    this.data.companies.forEach((_, index) => {
       worksheet.mergeCells(startRow + 2, index * 3 + 3, startRow + 2, index * 3 + 5);
     });
 
-    this.bidData.generalQuestions.forEach(question => {
+    this.data.generalQuestions.forEach(question => {
       const row = worksheet.addRow([
         question.category,
         question.question,
-        ...this.bidData.companies.reduce((acc: string[], company: Company) => acc.concat([company.answers[question.question], '', '']), [])
+        ...this.data.companies.reduce((acc: string[], company: Company) => acc.concat([company.answers[question.question], '', '']), [])
       ]);
       this.styleCategoryCell(row.getCell(1));
-      this.bidData.companies.forEach((_, index) => {
+      this.data.companies.forEach((_, index) => {
         worksheet.mergeCells(row.number, index * 3 + 3, row.number, index * 3 + 5);
       });
     });
@@ -608,7 +253,7 @@ export class ShortlistCommitteeComponent implements OnInit {
       const row = worksheet.addRow([
         '',
         category,
-        ...this.bidData.companies.reduce((acc: string[], company: Company) =>
+        ...this.data.companies.reduce((acc: string[], company: Company) =>
           acc.concat(company.committeeMembers.map(member =>
             category === 'Committee Member' ? `${member.name} (${member.role})` : (member[category.toLowerCase()] || '')
           )), [])
@@ -619,10 +264,10 @@ export class ShortlistCommitteeComponent implements OnInit {
     const avgScoreRow = worksheet.addRow([
       '',
       'Average Score',
-      ...this.bidData.companies.reduce((acc: string[], company: Company) => acc.concat([this.calculateAverageScore(company), '', '']), [])
+      ...this.data.companies.reduce((acc: string[], company: Company) => acc.concat([this.calculateAverageScore(company), '', '']), [])
     ]);
     avgScoreRow.getCell(2).font = { bold: true };
-    this.bidData.companies.forEach((_, index) => {
+    this.data.companies.forEach((_, index) => {
       worksheet.mergeCells(avgScoreRow.number, index * 3 + 3, avgScoreRow.number, index * 3 + 5);
     });
 
@@ -721,7 +366,7 @@ export class ShortlistCommitteeComponent implements OnInit {
 
     worksheet.addRow([]);
 
-    const headerRow = worksheet.addRow(['', '', ...this.bidData.companies.map((c: Company) => c.name)]);
+    const headerRow = worksheet.addRow(['', '', ...this.data.companies.map((c: Company) => c.name)]);
     this.styleHeaderRow(headerRow);
 
     const totalQuotedValues = this.companyTotals;

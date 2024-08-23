@@ -1,10 +1,10 @@
-// src/app/convertors/shortlist-committee-convertor.service.ts
+// src/app/convertors/shortlist-committee-2-convertor.service.ts
 
 import { Injectable } from '@angular/core';
 import { ShortlistCommitteeData, Company, Product } from '../models/shortlist-committee.model';
 
 @Injectable()
-export class ShortlistCommitteeConvertorService {
+export class PreAwardCommitteeConvertorService {
   calculateCompanyTotals(data: ShortlistCommitteeData): number[] {
     return data.companies.map((company: Company) => {
       return data.products.reduce((total: number, product: Product) => {
@@ -37,6 +37,4 @@ export class ShortlistCommitteeConvertorService {
 
     return totalScores.map(totalScore => totalScore / data.products.length);
   }
-
-
 }

@@ -24,7 +24,7 @@ export interface Product {
     companies: Company[];
 }
 
-export interface BidData {
+export interface ShortlistCommitteeData {
     generalQuestions: GeneralQuestion[];
     companies: Company[];
     products: Product[];

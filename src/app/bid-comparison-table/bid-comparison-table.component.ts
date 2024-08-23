@@ -3,7 +3,7 @@ import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { BidComparisonDataService } from '../services/bid-comparison-data.service';
 import { BidComparisonConvertorService } from '../convertors/bid-comparison-convertor.service';
-import { BidData } from '../models/bid-comparison-model';
+import { BidData } from '../models/bid-comparison.model';
 
 @Component({
   selector: 'app-bid-comparison-table',
