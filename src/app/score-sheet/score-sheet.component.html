@@ -3,56 +3,76 @@
     <h2>{{ committee.name }}</h2>
     <p><strong>Score Range:</strong> {{ committee.scoreRange.start }} - {{ committee.scoreRange.end }}</p>
 
-    <table class="main-table">
-      <thead>
-        <tr>
-          <th class="sticky-column sticky-column-1">Member</th>
-          <th class="sticky-column sticky-column-2">Category</th>
-          <th class="sticky-column sticky-column-3">Section</th>
-          <th class="sticky-column sticky-column-4">Section Weight</th>
-          <th class="sticky-column sticky-column-5">Questions</th>
-          <th class="sticky-column sticky-column-6">Question Weight</th>
-          <ng-container *ngFor="let supplier of committee.members[0]?.suppliers">
-            <th class="toggle-column">
-              <div class="toggle-bar" [class.expanded]="isSupplierExpanded(supplier.name, committeeIndex)">
-              </div>
-            </th>
-            <ng-container *ngIf="isSupplierExpanded(supplier.name, committeeIndex)">
-              <th>Answers</th>
-              <th>Score per Question</th>
-              <th>Score per Category</th>
-              <th>Score per Section</th>
+    <div class="table-container">
+      <!-- Fixed Header -->
+      <div class="fixed-table">
+        <table class="main-table main-table-one">
+          <thead class="table-header">
+            <tr>
+              <th>Member</th>
+              <th>Category</th>
+              <th>Section</th>
+              <th>Section Weight</th>
+              <th>Questions</th>
+              <th>Question Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let member of committee.members; trackBy: trackByMember">
+              <ng-container *ngFor="let category of member.categories; let categoryIndex = index; trackBy: trackByCategory">
+                <ng-container *ngFor="let section of category.sections; let sectionIndex = index; trackBy: trackBySection">
+                  <tr class="section-row">
+                    <td *ngIf="categoryIndex === 0 && sectionIndex === 0" [attr.rowspan]="getTotalRows(member)">
+                      {{ member.name }}
+                    </td>
+                    <td *ngIf="sectionIndex === 0" [attr.rowspan]="category.sections.length">{{ category.name }}</td>
+                    <td>{{ section.name }}</td>
+                    <td>{{ section.sectionWeight }}%</td>
+                    <td class="questions-column">
+                      <div *ngFor="let question of section.questions" class="question-row">
+                        <span class="question-text">{{ question.id }}</span>
+                      </div>
+                    </td>
+                    <td class="weights-column">
+                      <div *ngFor="let question of section.questions" class="question-row">
+                        <span class="weight-text">{{ question.weight }}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
             </ng-container>
-          </ng-container>
-        </tr>
-      </thead>
-      <tbody #tableBody>
-        <ng-container *ngFor="let member of committee.members; trackBy: trackByMember">
-          <ng-container *ngFor="let category of member.categories; let categoryIndex = index; trackBy: trackByCategory">
-            <ng-container *ngFor="let section of category.sections; let sectionIndex = index; trackBy: trackBySection">
-              <tr class="section-row">
-                <td *ngIf="categoryIndex === 0 && sectionIndex === 0" [attr.rowspan]="getTotalRows(member)"
-                    class="sticky-column sticky-column-1">{{ member.name }}</td>
-                <td *ngIf="sectionIndex === 0" [attr.rowspan]="category.sections.length" 
-                    class="sticky-column sticky-column-2">{{ category.name }}</td>
-                <td class="sticky-column sticky-column-3">{{ section.name }}</td>
-                <td class="sticky-column sticky-column-4">{{ section.sectionWeight }}%</td>
-                <td class="sticky-column sticky-column-5 questions-column">
-                  <div *ngFor="let question of section.questions" class="question-row">
-                    <span class="question-text">{{ question.id }}</span>
-                  </div>
-                </td>
-                <td class="sticky-column sticky-column-6 weights-column">
-                  <div *ngFor="let question of section.questions" class="question-row">
-                    <span class="weight-text">{{ question.weight }}%</span>
-                  </div>
-                </td>
+          </tbody>
+        </table>
+      </div>
 
-                <div class="scrollable-columns-wrapper">
-                  <div class="scrollable-columns">
+      <!-- Scrollable area for toggle columns -->
+      <div class="toggle-scrollable">
+        <table class="main-table main-table-two">
+          <thead>
+            <tr>
+              <ng-container *ngFor="let supplier of committee.members[0]?.suppliers">
+                <th class="toggle-column">
+                  <div class="toggle-bar" [class.expanded]="isSupplierExpanded(supplier.name, committeeIndex)">
+                  </div>
+                </th>
+                <ng-container *ngIf="isSupplierExpanded(supplier.name, committeeIndex)">
+                  <th>Answers</th>
+                  <th>Score per Question</th>
+                  <th>Score per Category</th>
+                  <th>Score per Section</th>
+                </ng-container>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let member of committee.members; trackBy: trackByMember">
+              <ng-container *ngFor="let category of member.categories; let categoryIndex = index; trackBy: trackByCategory">
+                <ng-container *ngFor="let section of category.sections; let sectionIndex = index; trackBy: trackBySection">
+                  <tr class="section-row">
                     <ng-container *ngFor="let supplier of member.suppliers">
                       <td *ngIf="categoryIndex === 0 && sectionIndex === 0" class="toggle-column supplier-column"
-                          [attr.data-member]="member.name" [attr.rowspan]="getTotalRows(member)">
+                        [attr.data-member]="member.name" [attr.rowspan]="getTotalRows(member)">
                         <div class="toggle-bar" [class.expanded]="isSupplierExpanded(supplier.name, committeeIndex)">
                           <button class="info-button" (click)="goToSupplierDetails(supplier, $event)">i</button>
                           <span>
@@ -65,7 +85,8 @@
                         </div>
                       </td>
                       <ng-container *ngIf="isSupplierExpanded(supplier.name, committeeIndex)">
-                        <ng-container *ngIf="supplier.data[getCombinedIndex(categoryIndex, sectionIndex, member)] as supplierData">
+                        <ng-container
+                          *ngIf="supplier.data[getCombinedIndex(categoryIndex, sectionIndex, member)] as supplierData">
                           <td class="answers-column">
                             <div *ngFor="let question of section.questions" class="question-row">
                               <span class="answer-text">{{ supplierData.answers[question.id] }}</span>
@@ -81,13 +102,13 @@
                         </ng-container>
                       </ng-container>
                     </ng-container>
-                  </div>
-                </div>
-              </tr>
+                  </tr>
+                </ng-container>
+              </ng-container>
             </ng-container>
-          </ng-container>
-        </ng-container>
-      </tbody>
-    </table>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </ng-container>
 </div>

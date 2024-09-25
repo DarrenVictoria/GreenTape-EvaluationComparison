@@ -1,8 +1,34 @@
 .score-sheet-container {
     padding: 20px;
-    max-width: 1000px;
+    min-width: 1400px;
+    width:auto;
     margin: auto;
     font-family: Arial, sans-serif;
+}
+
+.table-container {
+    display: flex; /* Use flexbox for side-by-side layout */
+    flex-direction: row; /* Align children in a row */
+    overflow-x: auto;
+}
+
+.fixed-table {
+    margin-right: 20px; /* Space between the two tables */
+}
+
+.main-table-one{
+    min-width:800px;
+}
+
+.main-table-two{
+    min-width:600px;
+}
+
+
+/* Main table styling */
+.main-table {
+    border-collapse: collapse;
+    width: fit-content; /* Allow tables to fit content */
 }
 
 .main-table th,
@@ -11,37 +37,6 @@
     padding: 8px;
     text-align: left;
     vertical-align: top;
-}
-
-.main-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 40px;
-    table-layout: fixed; /* To allow sticky columns to work properly */
-}
-
-.sticky-column {
-    position: sticky;
-    background-color: white; /* Maintain background on scroll */
-    z-index: 10;
-}
-
-/* Increment left values for each sticky column */
-.sticky-column-1 { left: 0; }
-.sticky-column-2 { left: 100px; }
-.sticky-column-3 { left: 200px; }
-.sticky-column-4 { left: 300px; }
-.sticky-column-5 { left: 400px; }
-.sticky-column-6 { left: 500px; }
-
-.scrollable-columns {
-    overflow-x: auto;
-    display: inline-block;
-    width: 100%;
-}
-
-.scrollable-columns-wrapper {
-    display: flex;
 }
 
 .section-row {
@@ -59,7 +54,6 @@
     display: flex;
     align-items: center;
     min-height: 40px;
-    /* Adjust this value as needed */
     padding: 4px 8px;
     border-bottom: 1px solid #ddd;
 }
@@ -77,42 +71,15 @@
     font-size: 0.75rem;
 }
 
-.nested-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-.nested-table td {
-    border: 1px solid #ddd;
-    padding: 2px;
-    min-height: 50px;
-    /* Adjust this value as needed */
-    height: 100%;
-}
-
-.tender-details p {
-    margin: 0.45rem;
-}
-
-.tender-details {
-    margin-bottom: 3rem;
-}
-
-.nested-table-row {
-    display: contents;
-}
-
-.nested-table-cell {
-    flex: 1;
-    display: flex;
-    align-items: center;
+.toggle-scrollable {
+    overflow-x: auto; /* Enables horizontal scrolling */
+    white-space: nowrap; /* Prevents text from wrapping */
 }
 
 .toggle-column {
-    width: 30px;
+    width: 30px; /* Adjust this width as needed */
     background-color: #f0f0f0;
     padding: 0;
-    position: relative;
 }
 
 .toggle-bar {
@@ -151,7 +118,6 @@
     font-size: 11px;
     margin-bottom: 1rem;
     color: white;
-
 }
 
 .info-button,
