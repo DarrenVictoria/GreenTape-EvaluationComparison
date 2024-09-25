@@ -1,5 +1,6 @@
 <div class="shortlist-committee-container">
   <h2>General Questions</h2>
+  <div class="table-wrapper">
   <table *ngIf="data">
     <thead>
       <tr>
@@ -64,9 +65,11 @@
       </tr>
     </tbody>
   </table>
+</div>
 
   <div *ngFor="let product of data?.products">
     <h2>{{ product.name }}</h2>
+    <div class="table-wrapper">
     <table>
       <thead>
         <tr>
@@ -128,7 +131,9 @@
       </tbody>
     </table>
   </div>
+  </div>
 
+  <div class="table-wrapper">
   <table *ngIf="data">
     <thead>
       <tr>
@@ -154,4 +159,5 @@
       </tr>
     </tbody>
   </table>
+</div>
 </div>

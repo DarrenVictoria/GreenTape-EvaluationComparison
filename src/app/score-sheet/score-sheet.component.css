@@ -5,18 +5,43 @@
     font-family: Arial, sans-serif;
 }
 
-.main-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 40px;
-}
-
 .main-table th,
 .main-table td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
     vertical-align: top;
+}
+
+.main-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 40px;
+    table-layout: fixed; /* To allow sticky columns to work properly */
+}
+
+.sticky-column {
+    position: sticky;
+    background-color: white; /* Maintain background on scroll */
+    z-index: 10;
+}
+
+/* Increment left values for each sticky column */
+.sticky-column-1 { left: 0; }
+.sticky-column-2 { left: 100px; }
+.sticky-column-3 { left: 200px; }
+.sticky-column-4 { left: 300px; }
+.sticky-column-5 { left: 400px; }
+.sticky-column-6 { left: 500px; }
+
+.scrollable-columns {
+    overflow-x: auto;
+    display: inline-block;
+    width: 100%;
+}
+
+.scrollable-columns-wrapper {
+    display: flex;
 }
 
 .section-row {

@@ -2,112 +2,120 @@
   <h2>Shortlisted Suppliers</h2>
   <div *ngFor="let product of awarderData.shortlistedProducts.products">
     <h3>{{ product.name }} ({{ product.unitCount }} units)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Question</th>
-          <th *ngFor="let company of product.companies">{{ company.name }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Awarded Units</td>
-          <td *ngFor="let company of product.companies">
-            {{ company.awardedUnits }} / {{ product.unitCount }} units
-          </td>
-        </tr>
-        <tr *ngFor="let question of product.generalQuestions">
-          <td>{{ question.question }}</td>
-          <td *ngFor="let company of product.companies"
-            [ngClass]="{'lowest-price': company.isLowestPrice && question.question === 'Total price for this product/service'}">
-            {{ company.answers[question.question] }}
-          </td>
-        </tr>
-        <tr>
-          <td>Committee Member</td>
-          <td *ngFor="let company of product.companies">
-            {{ company.committeeMembers[0].name }} ({{ company.committeeMembers[0].role }})
-          </td>
-        </tr>
-        <tr>
-          <td>Comment</td>
-          <td *ngFor="let company of product.companies">
-            {{ company.committeeMembers[0].comment }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th *ngFor="let company of product.companies">{{ company.name }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Awarded Units</td>
+            <td *ngFor="let company of product.companies">
+              {{ company.awardedUnits }} / {{ product.unitCount }} units
+            </td>
+          </tr>
+          <tr *ngFor="let question of product.generalQuestions">
+            <td>{{ question.question }}</td>
+            <td *ngFor="let company of product.companies"
+                [ngClass]="{'lowest-price': company.isLowestPrice && question.question === 'Total price for this product/service'}">
+              {{ company.answers[question.question] }}
+            </td>
+          </tr>
+          <tr>
+            <td>Committee Member</td>
+            <td *ngFor="let company of product.companies">
+              {{ company.committeeMembers[0].name }} ({{ company.committeeMembers[0].role }})
+            </td>
+          </tr>
+          <tr>
+            <td>Comment</td>
+            <td *ngFor="let company of product.companies">
+              {{ company.committeeMembers[0].comment }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <h2>Rejected Suppliers</h2>
   <div *ngFor="let product of awarderData.rejectedProducts.products">
     <h3>{{ product.name }}</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th *ngFor="let supplier of product.suppliers">{{ supplier.name }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let question of product.generalQuestions">
+            <td>{{ question.question }}</td>
+            <td *ngFor="let supplier of product.suppliers"
+                [ngClass]="{'lowest-price': supplier.isLowestPrice && question.question === 'Total price for this product/service'}">
+              {{ supplier.answers[question.question] }}
+            </td>
+          </tr>
+          <tr>
+            <td>Committee Member</td>
+            <td *ngFor="let supplier of product.suppliers">
+              {{ supplier.committeeMembers[0].name }} ({{ supplier.committeeMembers[0].role }})
+            </td>
+          </tr>
+          <tr>
+            <td>Comment</td>
+            <td *ngFor="let supplier of product.suppliers">
+              {{ supplier.committeeMembers[0].comment }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2>Lowest Price Quoted</h2>
+  <div class="table-wrapper">
     <table>
       <thead>
         <tr>
-          <th>Question</th>
-          <th *ngFor="let supplier of product.suppliers">{{ supplier.name }}</th>
+          <th>Product</th>
+          <th>Supplier</th>
+          <th>Price</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let question of product.generalQuestions">
-          <td>{{ question.question }}</td>
-          <td *ngFor="let supplier of product.suppliers"
-            [ngClass]="{'lowest-price': supplier.isLowestPrice && question.question === 'Total price for this product/service'}">
-            {{ supplier.answers[question.question] }}
-          </td>
-        </tr>
-        <tr>
-          <td>Committee Member</td>
-          <td *ngFor="let supplier of product.suppliers">
-            {{ supplier.committeeMembers[0].name }} ({{ supplier.committeeMembers[0].role }})
-          </td>
-        </tr>
-        <tr>
-          <td>Comment</td>
-          <td *ngFor="let supplier of product.suppliers">
-            {{ supplier.committeeMembers[0].comment }}
-          </td>
+        <tr *ngFor="let item of awarderData.lowestPriceQuoted">
+          <td>{{ item.product }}</td>
+          <td>{{ item.supplier }}</td>
+          <td>{{ item.price }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <h2>Lowest Price Quoted</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Supplier</th>
-        <th>Price</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of awarderData.lowestPriceQuoted">
-        <td>{{ item.product }}</td>
-        <td>{{ item.supplier }}</td>
-        <td>{{ item.price }}</td>
-      </tr>
-    </tbody>
-  </table>
-
   <h2>Amended Product Quantities</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Original Quantity</th>
-        <th>New Quantity</th>
-        <th>Remarks</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of awarderData.amendedProductQuantities">
-        <td>{{ item.product }}</td>
-        <td>{{ item.initialQuantity }}</td>
-        <td>{{ item.amendedQuantity }}</td>
-        <td>{{ item.remarks }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Original Quantity</th>
+          <th>New Quantity</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of awarderData.amendedProductQuantities">
+          <td>{{ item.product }}</td>
+          <td>{{ item.initialQuantity }}</td>
+          <td>{{ item.amendedQuantity }}</td>
+          <td>{{ item.remarks }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

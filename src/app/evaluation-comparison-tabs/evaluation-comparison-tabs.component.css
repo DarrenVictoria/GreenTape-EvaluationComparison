@@ -36,7 +36,7 @@
     border-top: none;
     max-height: 600px;
     /* Set a maximum height */
-    overflow-x: auto;
+    /* overflow-x: auto; */
     /* Add horizontal scrollbar when needed */
     overflow-y: auto;
     /* Add vertical scrollbar when needed */

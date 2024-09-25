@@ -13,17 +13,25 @@
     margin-bottom: 3rem;
 }
 
+.table-wrapper {
+    width: 100%;
+    max-width: 900px;
+    overflow-x: auto; /* Enables horizontal scrolling */
+    margin-bottom: 20px;
+}
+
 table {
     width: 100%;
+    min-width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
 }
 
-th,
-td {
+th, td {
     border: 1px solid #004d00;
     padding: 8px;
     text-align: left;
+    white-space: nowrap; /* Prevents text from wrapping */
 }
 
 thead th {
@@ -39,18 +47,15 @@ tbody tr:last-child {
     background-color: #d3d3d3;
 }
 
-/* Style for committee member names */
-tbody tr:nth-child(5) th {
-    background-color: #d3d3d3;
-}
-
-/* Style for AVG SCORE row */
-tbody tr:last-child td {
-    font-weight: bold;
-}
-
 .lowest-price {
-    background-color: #9CFF9C;
-    /* Light green background */
+    background-color: #9CFF9C; /* Light green background */
     font-weight: bold;
+}
+
+/* Media query for smaller screens */
+@media screen and (max-width: 900px) {
+    .table-wrapper {
+        max-width: 100%;
+        overflow-x: auto;
+    }
 }

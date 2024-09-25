@@ -1,28 +1,6 @@
 <div class="bid-comparison-container">
-
   <h2>General Questions</h2>
-  <table>
-    <thead>
-      <tr>
-        <th class="header-clean"></th>
-        <th>Question</th>
-        <th *ngFor="let company of bidData.companies">{{ company }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let section of bidData.generalQuestions">
-        <tr *ngFor="let question of section.questions; let i = index">
-          <td *ngIf="i === 0" [attr.rowspan]="section.questions.length" [style.background-color]="'#e0e0e0'">{{
-            section.name }}</td>
-          <td>{{ question.question }}</td>
-          <td *ngFor="let answer of question.answers">{{ answer }}</td>
-        </tr>
-      </ng-container>
-    </tbody>
-  </table>
-
-  <div *ngFor="let category of bidData.productQuestions">
-    <h2>{{ category.category }}</h2>
+  <div class="table-wrapper">
     <table>
       <thead>
         <tr>
@@ -32,38 +10,66 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let section of category.sections">
+        <ng-container *ngFor="let section of bidData.generalQuestions">
           <tr *ngFor="let question of section.questions; let i = index">
             <td *ngIf="i === 0" [attr.rowspan]="section.questions.length" [style.background-color]="'#e0e0e0'">
               {{ section.name }}
             </td>
             <td>{{ question.question }}</td>
-            <td *ngFor="let answer of question.answers"
-              [ngClass]="{'lowest-price': section.name === 'Pricing' && isLowestPrice(answer, question.answers)}">
-              {{ answer }}
-            </td>
+            <td *ngFor="let answer of question.answers">{{ answer }}</td>
           </tr>
         </ng-container>
       </tbody>
     </table>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th class="header-clean"></th>
-        <th></th>
-        <th *ngFor="let company of bidData.companies">{{ company }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="background-color: #e0e0e0;">Comparison</td>
-        <td>Total Quoted</td>
-        <td *ngFor="let total of companyTotals" [ngClass]="{'lowest-price': isLowestPrice(total, companyTotals)}">
-          {{ total | number:'1.0-0' }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div *ngFor="let category of bidData.productQuestions">
+    <h2>{{ category.category }}</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th class="header-clean"></th>
+            <th>Question</th>
+            <th *ngFor="let company of bidData.companies">{{ company }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let section of category.sections">
+            <tr *ngFor="let question of section.questions; let i = index">
+              <td *ngIf="i === 0" [attr.rowspan]="section.questions.length" [style.background-color]="'#e0e0e0'">
+                {{ section.name }}
+              </td>
+              <td>{{ question.question }}</td>
+              <td *ngFor="let answer of question.answers"
+                [ngClass]="{'lowest-price': section.name === 'Pricing' && isLowestPrice(answer, question.answers)}">
+                {{ answer }}
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th class="header-clean"></th>
+          <th></th>
+          <th *ngFor="let company of bidData.companies">{{ company }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="background-color: #e0e0e0;">Comparison</td>
+          <td>Total Quoted</td>
+          <td *ngFor="let total of companyTotals" [ngClass]="{'lowest-price': isLowestPrice(total, companyTotals)}">
+            {{ total | number:'1.0-0' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
