@@ -1,9 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import * as ExcelJS from 'exceljs';
 import * as FileSaver from 'file-saver';
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { ShortlistCommitteeService } from '../services/shortlist-committee.service';
 import { ShortlistCommitteeConvertorService } from '../convertors/shortlist-committee-convertor.service';
 import { ShortlistCommitteeData, Company, Product } from '../models/shortlist-committee.model';
+
+type TableCell = {
+  text?: string;
+  colSpan?: number;
+  rowSpan?: number;
+  fillColor?: string;
+  style?: string;
+};
 
 @Component({
   selector: 'app-shortlist-committee',
@@ -400,4 +410,223 @@ export class ShortlistCommitteeComponent implements OnInit {
 
     return worksheet.rowCount;
   }
+
+  private readonly COMPANIES_PER_PAGE = 3;
+
+  exportPDF(): void {
+    (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
+
+    const docDefinition = {
+      pageOrientation: 'landscape',
+      content: [
+        { text: 'Shortlist Committee Report', style: 'header' },
+        ...this.generateGeneralQuestionsTables(),
+        ...this.generateProductTables(),
+        this.generateFinalSummaryTable()
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10]
+        },
+        subheader: {
+          fontSize: 16,
+          bold: true,
+          margin: [0, 10, 0, 5]
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 13,
+          color: 'white',
+          fillColor: '#00B050'
+        }
+      },
+      defaultStyle: {
+        fontSize: 10
+      }
+    };
+
+    pdfMake.createPdf(docDefinition).download('ShortlistCommitteeReport.pdf');
+  }
+
+  private generateGeneralQuestionsTables() {
+    const tables = [];
+    for (let i = 0; i < this.data.companies.length; i += this.COMPANIES_PER_PAGE) {
+      const companiesGroup = this.data.companies.slice(i, i + this.COMPANIES_PER_PAGE);
+      tables.push(this.createGeneralQuestionsTable(companiesGroup, i === 0));
+    }
+    return tables;
+  }
+
+  private createGeneralQuestionsTable(companies, isFirstTable) {
+    const table = {
+      table: {
+        headerRows: 2,
+        body: [
+          [
+            { text: 'Category', style: 'tableHeader', rowSpan: 2 },
+            { text: 'General Questions', style: 'tableHeader', rowSpan: 2 },
+            { text: 'Companies', style: 'tableHeader', colSpan: companies.length * 3 },
+            ...Array(companies.length * 3 - 1).fill({})
+          ],
+          [
+            {}, {},
+            ...companies.flatMap(company => [
+              { text: company.name, style: 'tableHeader', colSpan: 3 },
+              {}, {}
+            ])
+          ],
+          [
+            { text: 'Number of Members Shortlisted', colSpan: 2 },
+            {},
+            ...companies.flatMap(company => [
+              { text: company.shortlistedMembers, colSpan: 3 },
+              {}, {}
+            ])
+          ]
+        ]
+      }
+    };
+
+    this.data.generalQuestions.forEach(question => {
+      table.table.body.push([
+        question.category,
+        question.question,
+        ...companies.reduce((acc, company) =>
+          acc.concat([{ text: company.answers[question.question], colSpan: 3 }, {}, {}]), [])
+      ]);
+    });
+
+    ['Committee Member', 'Score', 'Comment', 'Shortlisted'].forEach(row => {
+      table.table.body.push([
+        { text: row, colSpan: 2 },
+        {},
+        ...companies.reduce((acc, company) =>
+          acc.concat(company.committeeMembers.map(member =>
+            row === 'Committee Member' ? `${member.name} (${member.role})` : member[row.toLowerCase()]
+          )), [])
+      ]);
+    });
+
+    table.table.body.push([
+      { text: 'Average Score', colSpan: 2 },
+      {},
+      ...companies.map(company => ({ text: this.calculateAverageScore(company), colSpan: 3 })),
+      ...Array(companies.length * 2).fill({})
+    ]);
+
+    return [
+      { text: isFirstTable ? 'General Questions' : 'General Questions (Continued)', style: 'subheader', pageBreak: isFirstTable ? undefined : 'before' },
+      table
+    ];
+  }
+
+  private generateProductTables() {
+    return this.data.products.reduce((acc, product) => {
+      const tables = [];
+      for (let i = 0; i < product.companies.length; i += this.COMPANIES_PER_PAGE) {
+        const companiesGroup = product.companies.slice(i, i + this.COMPANIES_PER_PAGE);
+        tables.push(this.createProductTable(product, companiesGroup, i === 0));
+      }
+      return acc.concat(tables);
+    }, []);
+  }
+
+  private createProductTable(product, companies, isFirstTable) {
+    const table = {
+      table: {
+        headerRows: 2,
+        body: [
+          [
+            { text: 'Category', style: 'tableHeader', rowSpan: 2 } as TableCell,
+            { text: 'Question', style: 'tableHeader', rowSpan: 2 } as TableCell,
+            { text: 'Companies', style: 'tableHeader', colSpan: companies.length * 3 } as TableCell,
+            ...Array(companies.length * 3 - 1).fill({})
+          ],
+          [
+            {}, {},
+            ...companies.flatMap(company => [
+              { text: company.name, style: 'tableHeader', colSpan: 3 } as TableCell,
+              {}, {}
+            ])
+          ],
+          [
+            { text: 'Number of Members Shortlisted', colSpan: 2 } as TableCell,
+            {},
+            ...companies.flatMap(company => [
+              { text: company.shortlistedMembers, colSpan: 3 } as TableCell,
+              {}, {}
+            ])
+          ]
+        ] as TableCell[][]
+      }
+    };
+
+    product.generalQuestions.forEach(question => {
+      const row: TableCell[] = [
+        { text: question.category } as TableCell,
+        { text: question.question } as TableCell,
+        ...companies.reduce((acc: TableCell[], company) => {
+          const cell: TableCell = { text: company.answers[question.question], colSpan: 3 };
+          if (question.question === 'Total price for this product/service' && company.isLowestPrice) {
+            cell.fillColor = '#D9F3AD';
+          }
+          return acc.concat([cell, {}, {}]);
+        }, [])
+      ];
+      table.table.body.push(row);
+    });
+
+    ['Committee Member', 'Score', 'Comment', 'Shortlisted'].forEach(rowLabel => {
+      const row: TableCell[] = [
+        { text: rowLabel, colSpan: 2 } as TableCell,
+        {},
+        ...companies.reduce((acc: TableCell[], company) =>
+          acc.concat(company.committeeMembers.map(member =>
+            ({ text: rowLabel === 'Committee Member' ? `${member.name} (${member.role})` : member[rowLabel.toLowerCase()] } as TableCell)
+          )), [])
+      ];
+      table.table.body.push(row);
+    });
+
+    return [
+      { text: isFirstTable ? product.name : `${product.name} (Continued)`, style: 'subheader', pageBreak: 'before' },
+      table
+    ];
+  }
+
+  private generateFinalSummaryTable() {
+    const table = {
+      table: {
+        headerRows: 1,
+        body: [
+          [
+            { text: '', style: 'tableHeader' },
+            ...this.data.companies.map(company => ({ text: company.name, style: 'tableHeader' }))
+          ],
+          [
+            'Total Quoted',
+            ...this.companyTotals.map((total, index) => ({
+              text: total.toFixed(2),
+              fillColor: this.isLowestPrice(total, this.companyTotals) ? '#92D050' : null
+            }))
+          ],
+          [
+            'Avg Score %',
+            ...this.companyAvgScores.map(score => score.toFixed(2) + '%')
+          ]
+        ]
+      }
+    };
+
+    return [
+      { text: 'Final Summary', style: 'subheader', pageBreak: 'before' },
+      table
+    ];
+  }
+
+
+
+
 }

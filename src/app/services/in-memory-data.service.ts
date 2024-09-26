@@ -767,6 +767,102 @@ export class InMemoryDataService implements InMemoryDbService {
           ]
         },
         {
+          "name": "Office Hub Ltd",
+          "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
+          "answers": {
+            "How long has your company been in business?": "10 years",
+            "What warranty do you offer on your products?": "2 years",
+            "Do you provide technical support 24/7?": "Yes, phone and email support available."
+          },
+          "committeeMembers": [
+            {
+              "name": "Ballok Singh",
+              "role": "Member",
+              "score": "85%",
+              "comment": "Reliable and well-established company.",
+              "shortlisted": "YES"
+            },
+            {
+              "name": "Aaliyah Mohamed",
+              "role": "Member",
+              "score": "75%",
+              "comment": "Good warranty terms, but higher pricing.",
+              "shortlisted": "YES"
+            },
+            {
+              "name": "Daniel Perera",
+              "role": "Nominee",
+              "score": "Not Applicable",
+              "comment": "Good warranty terms, but higher pricing.",
+              "shortlisted": "YES"
+            }
+          ]
+        },
+        {
+          "name": "Office Hub Ltd",
+          "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
+          "answers": {
+            "How long has your company been in business?": "10 years",
+            "What warranty do you offer on your products?": "2 years",
+            "Do you provide technical support 24/7?": "Yes, phone and email support available."
+          },
+          "committeeMembers": [
+            {
+              "name": "Ballok Singh",
+              "role": "Member",
+              "score": "85%",
+              "comment": "Reliable and well-established company.",
+              "shortlisted": "YES"
+            },
+            {
+              "name": "Aaliyah Mohamed",
+              "role": "Member",
+              "score": "75%",
+              "comment": "Good warranty terms, but higher pricing.",
+              "shortlisted": "YES"
+            },
+            {
+              "name": "Daniel Perera",
+              "role": "Nominee",
+              "score": "Not Applicable",
+              "comment": "Good warranty terms, but higher pricing.",
+              "shortlisted": "YES"
+            }
+          ]
+        },
+        {
+          "name": "Office Hub Ltd",
+          "shortlistedMembers": "1 / 2 Members Shortlisted this Supplier",
+          "answers": {
+            "How long has your company been in business?": "10 years",
+            "What warranty do you offer on your products?": "2 years",
+            "Do you provide technical support 24/7?": "Yes, phone and email support available."
+          },
+          "committeeMembers": [
+            {
+              "name": "Ballok Singh",
+              "role": "Member",
+              "score": "85%",
+              "comment": "Reliable and well-established company.",
+              "shortlisted": "YES"
+            },
+            {
+              "name": "Aaliyah Mohamed",
+              "role": "Member",
+              "score": "75%",
+              "comment": "Good warranty terms, but higher pricing.",
+              "shortlisted": "YES"
+            },
+            {
+              "name": "Daniel Perera",
+              "role": "Nominee",
+              "score": "Not Applicable",
+              "comment": "Good warranty terms, but higher pricing.",
+              "shortlisted": "YES"
+            }
+          ]
+        },
+        {
           "name": "Supplies Unlimited",
           "shortlistedMembers": "0 / 2 Members Shortlisted this Supplier",
           "answers": {
@@ -1104,7 +1200,97 @@ export class InMemoryDataService implements InMemoryDbService {
                     "shortlisted": "YES"
                   }
                 ]
-              }
+              },
+              {
+                "name": "Office Hub Ltd",
+                "awardedUnits": 50,
+                "shortlistedMembers": "1 / 1 Member Shortlisted this Supplier",
+                "answers": {
+                  "Total price for this product/service": "15000",
+                  "Do you have data controls?": "Yes"
+                },
+                "committeeMembers": [
+                  {
+                    "name": "Dinusha Hewage",
+                    "role": "Award Nominee",
+                    "score": "66%",
+                    "comment": "Ok. Guarantee period and maintenance clause is acceptable.",
+                    "shortlisted": "YES"
+                  }
+                ]
+              },
+              {
+                "name": "Office Hub Ltd",
+                "awardedUnits": 50,
+                "shortlistedMembers": "1 / 1 Member Shortlisted this Supplier",
+                "answers": {
+                  "Total price for this product/service": "15000",
+                  "Do you have data controls?": "Yes"
+                },
+                "committeeMembers": [
+                  {
+                    "name": "Dinusha Hewage",
+                    "role": "Award Nominee",
+                    "score": "66%",
+                    "comment": "Ok. Guarantee period and maintenance clause is acceptable.",
+                    "shortlisted": "YES"
+                  }
+                ]
+              },
+              {
+                "name": "Office Hub Ltd",
+                "awardedUnits": 50,
+                "shortlistedMembers": "1 / 1 Member Shortlisted this Supplier",
+                "answers": {
+                  "Total price for this product/service": "15000",
+                  "Do you have data controls?": "Yes"
+                },
+                "committeeMembers": [
+                  {
+                    "name": "Dinusha Hewage",
+                    "role": "Award Nominee",
+                    "score": "66%",
+                    "comment": "Ok. Guarantee period and maintenance clause is acceptable.",
+                    "shortlisted": "YES"
+                  }
+                ]
+              },
+              {
+                "name": "Office Hub Ltd",
+                "awardedUnits": 50,
+                "shortlistedMembers": "1 / 1 Member Shortlisted this Supplier",
+                "answers": {
+                  "Total price for this product/service": "15000",
+                  "Do you have data controls?": "Yes"
+                },
+                "committeeMembers": [
+                  {
+                    "name": "Dinusha Hewage",
+                    "role": "Award Nominee",
+                    "score": "66%",
+                    "comment": "Ok. Guarantee period and maintenance clause is acceptable.",
+                    "shortlisted": "YES"
+                  }
+                ]
+              },
+              {
+                "name": "Office Hub Ltd",
+                "awardedUnits": 50,
+                "shortlistedMembers": "1 / 1 Member Shortlisted this Supplier",
+                "answers": {
+                  "Total price for this product/service": "15000",
+                  "Do you have data controls?": "Yes"
+                },
+                "committeeMembers": [
+                  {
+                    "name": "Dinusha Hewage",
+                    "role": "Award Nominee",
+                    "score": "66%",
+                    "comment": "Ok. Guarantee period and maintenance clause is acceptable.",
+                    "shortlisted": "YES"
+                  }
+                ]
+              },
             ]
           },
           {
@@ -1592,7 +1778,7 @@ export class InMemoryDataService implements InMemoryDbService {
               ]
             },
             {
-              name: 'Mark',
+              name: 'Mark Smith Waterbottle',
               categories: [
                 {
                   name: 'General',

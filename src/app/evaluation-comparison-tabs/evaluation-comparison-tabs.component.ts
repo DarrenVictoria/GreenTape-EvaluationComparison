@@ -11,6 +11,11 @@ import { ScoreSheetComponent } from '../score-sheet/score-sheet.component';
 import { TenderDetailsService } from '../services/tender-details.service';
 import { TenderDetailsConverterService } from '../convertors/tender-details-convertor.service';
 import { TenderDetails } from '../models/tender-details.model';
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+// import { TDocumentDefinitions } from 'pdfmake/interfaces';
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-evaluation-comparison-tabs',
@@ -329,6 +334,72 @@ export class EvaluationComparisonTabsComponent implements OnInit {
       }
     });
   }
+
+  // async exportAndMergePDFs() {
+  //   const components = [
+  //     { name: 'Bid Comparison', component: this.bidComparisonTableComponent },
+  //     { name: 'Shortlist Committee 1', component: this.shortlistCommitteeComponent },
+  //     { name: 'Shortlist Committee 2', component: this.shortlistCommittee2Component },
+  //     { name: 'Preaward Committee', component: this.preawardCommitteeComponent },
+  //     { name: 'Awarder', component: this.awarderComponent }
+  //   ];
+
+  //   const allContent = [];
+
+  //   for (const { name, component } of components) {
+  //     if (component && typeof component.exportPDF === 'function') {
+  //       console.log(`Exporting ${name} content`);
+
+  //       try {
+  //         const content = await component.exportPDF();
+
+  //         // Add a title for each component
+  //         allContent.push({ text: name, style: 'header', pageBreak: 'before' });
+
+  //         // Add the component's content
+  //         allContent.push(content);
+
+  //         console.log(`${name} content exported successfully`);
+  //       } catch (error) {
+  //         console.error(`Error exporting ${name} content:`, error);
+  //         allContent.push({ text: `Error exporting ${name}: ${error.message}`, style: 'error' });
+  //       }
+  //     } else {
+  //       console.log(`${name} component or exportPDF method not found`);
+  //     }
+  //   }
+
+  //   // Remove the pageBreak from the first component
+  //   if (allContent.length > 0) {
+  //     delete allContent[0].pageBreak;
+  //   }
+
+  //   const docDefinition: TDocumentDefinitions = {
+  //     content: allContent,
+  //     styles: {
+  //       header: {
+  //         fontSize: 18,
+  //         bold: true,
+  //         margin: [0, 0, 0, 10]
+  //       },
+  //       subheader: {
+  //         fontSize: 14,
+  //         bold: true,
+  //         margin: [0, 10, 0, 5]
+  //       },
+  //       error: {
+  //         fontSize: 12,
+  //         color: 'red',
+  //         margin: [0, 0, 0, 5]
+  //       }
+  //     }
+  //   };
+
+  //   pdfMake.createPdf(docDefinition).download('MergedEvaluationComparison.pdf');
+  //   console.log('Merged PDF created and downloaded');
+  // }
+
+
 }
 
 

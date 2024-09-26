@@ -15,7 +15,8 @@
     <app-score-sheet [style.display]="activeTab === 5 ? 'block' : 'none'"></app-score-sheet>
   </div>
 
-  <div class="export-all">
+  <div class="export-buttons">
     <button (click)="exportToExcel()">Export All to Excel</button>
+    <button (click)="exportAndMergePDFs">Export All to PDF</button>
   </div>
 </div>

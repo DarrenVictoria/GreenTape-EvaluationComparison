@@ -4,6 +4,12 @@ import { saveAs } from 'file-saver';
 import { AwarderService } from '../services/awarder.service';
 import { AwarderConvertorService } from '../convertors/awarder-convetor.service';
 import { AwarderFullData, Product, RejectedProduct } from '../models/awarder.model';
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+
+
+
+(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-awarder',
@@ -249,4 +255,197 @@ export class AwarderComponent implements OnInit {
       });
     }
   }
+
+  exportPDF() {
+    const docDefinition: any = {
+      content: [
+        { text: 'Awarder Report', style: 'header' },
+        ...this.getShortlistedSuppliersContent(),
+        ...this.getRejectedSuppliersContent(),
+        ...this.getLowestPriceQuotedContent(),
+        ...this.getAmendedProductQuantitiesContent()
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10]
+        },
+        subheader: {
+          fontSize: 16,
+          bold: true,
+          margin: [0, 10, 0, 5]
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 13,
+          color: 'white',
+          fillColor: '#00B050'
+        }
+      },
+      defaultStyle: {
+        fontSize: 10
+      },
+      pageOrientation: 'landscape',
+      pageMargins: [40, 60, 40, 60]
+    };
+
+    pdfMake.createPdf(docDefinition).download('awarder-report.pdf');
+  }
+
+  private getShortlistedSuppliersContent(): any[] {
+    const content: any[] = [
+      { text: 'Shortlisted Suppliers', style: 'subheader' }
+    ];
+
+    this.awarderData.shortlistedProducts.products.forEach((product: Product) => {
+      content.push({ text: `${product.name} (${product.unitCount} units)`, style: 'subheader' });
+
+      const chunks = this.chunkArray(product.companies, 3);
+      chunks.forEach((chunk, index) => {
+        const tableBody = this.getTableBody(product, chunk);
+        content.push({
+          table: {
+            headerRows: 1,
+            body: tableBody
+          },
+          layout: {
+            fillColor: (rowIndex: number, node: any, columnIndex: number) => {
+              return (rowIndex === 0) ? '#00B050' : null;
+            }
+          },
+          margin: [0, 0, 0, (index < chunks.length - 1) ? 10 : 20]
+        });
+      });
+    });
+
+    return content;
+  }
+
+  private getRejectedSuppliersContent(): any[] {
+    const content: any[] = [
+      { text: 'Rejected Suppliers', style: 'subheader' }
+    ];
+
+    this.awarderData.rejectedProducts.products.forEach((product: RejectedProduct) => {
+      content.push({ text: product.name, style: 'subheader' });
+
+      const chunks = this.chunkArray(product.suppliers, 3);
+      chunks.forEach((chunk, index) => {
+        const tableBody = this.getRejectedTableBody(product, chunk);
+        content.push({
+          table: {
+            headerRows: 1,
+            body: tableBody
+          },
+          layout: {
+            fillColor: (rowIndex: number, node: any, columnIndex: number) => {
+              return (rowIndex === 0) ? '#00B050' : null;
+            }
+          },
+          margin: [0, 0, 0, (index < chunks.length - 1) ? 10 : 20]
+        });
+      });
+    });
+
+    return content;
+  }
+
+  private getTableBody(product: Product, companies: any[]): any[][] {
+    const tableBody = [
+      ['Question', ...companies.map(c => c.name)],
+      ['Awarded Units', ...companies.map(c => `${c.awardedUnits} / ${product.unitCount} units`)]
+    ];
+
+    product.generalQuestions.forEach(question => {
+      const row = [question.question, ...companies.map(company => company.answers[question.question] as string)];
+      tableBody.push(row);
+    });
+
+    ['Committee Member', 'Comment'].forEach(category => {
+      const row = [category, ...companies.map(company => {
+        const committeeMember = company.committeeMembers[0];
+        return category === 'Committee Member'
+          ? `${committeeMember.name} (${committeeMember.role})`
+          : committeeMember.comment;
+      })];
+      tableBody.push(row);
+    });
+
+    return tableBody;
+  }
+
+  private getRejectedTableBody(product: RejectedProduct, suppliers: any[]): any[][] {
+    const tableBody = [
+      ['Question', ...suppliers.map(s => s.name)]
+    ];
+
+    product.generalQuestions.forEach(question => {
+      const row = [question.question, ...suppliers.map(supplier => supplier.answers[question.question] as string)];
+      tableBody.push(row);
+    });
+
+    ['Committee Member', 'Comment'].forEach(category => {
+      const row = [category, ...suppliers.map(supplier => {
+        const committeeMember = supplier.committeeMembers[0];
+        return category === 'Committee Member'
+          ? `${committeeMember.name} (${committeeMember.role})`
+          : committeeMember.comment;
+      })];
+      tableBody.push(row);
+    });
+
+    return tableBody;
+  }
+
+  private getLowestPriceQuotedContent(): any[] {
+    return [
+      { text: 'Lowest Price Quoted', style: 'subheader' },
+      {
+        table: {
+          headerRows: 1,
+          body: [
+            ['Product', 'Supplier', 'Price'],
+            ...this.awarderData.lowestPriceQuoted.map(item => [item.product, item.supplier, item.price])
+          ]
+        },
+        layout: {
+          fillColor: (rowIndex: number, node: any, columnIndex: number) => {
+            return (rowIndex === 0) ? '#00B050' : null;
+          }
+        }
+      }
+    ];
+  }
+
+  private getAmendedProductQuantitiesContent(): any[] {
+    return [
+      { text: 'Amended Product Quantities', style: 'subheader' },
+      {
+        table: {
+          headerRows: 1,
+          body: [
+            ['Product', 'Original Quantity', 'New Quantity', 'Remarks'],
+            ...this.awarderData.amendedProductQuantities.map(item => [
+              item.product, item.initialQuantity, item.amendedQuantity, item.remarks
+            ])
+          ]
+        },
+        layout: {
+          fillColor: (rowIndex: number, node: any, columnIndex: number) => {
+            return (rowIndex === 0) ? '#00B050' : null;
+          }
+        }
+      }
+    ];
+  }
+
+  private chunkArray(array: any[], chunkSize: number): any[][] {
+    const results = [];
+    while (array.length) {
+      results.push(array.splice(0, chunkSize));
+    }
+    return results;
+  }
+
 }

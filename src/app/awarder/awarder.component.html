@@ -20,7 +20,7 @@
           <tr *ngFor="let question of product.generalQuestions">
             <td>{{ question.question }}</td>
             <td *ngFor="let company of product.companies"
-                [ngClass]="{'lowest-price': company.isLowestPrice && question.question === 'Total price for this product/service'}">
+              [ngClass]="{'lowest-price': company.isLowestPrice && question.question === 'Total price for this product/service'}">
               {{ company.answers[question.question] }}
             </td>
           </tr>
@@ -56,7 +56,7 @@
           <tr *ngFor="let question of product.generalQuestions">
             <td>{{ question.question }}</td>
             <td *ngFor="let supplier of product.suppliers"
-                [ngClass]="{'lowest-price': supplier.isLowestPrice && question.question === 'Total price for this product/service'}">
+              [ngClass]="{'lowest-price': supplier.isLowestPrice && question.question === 'Total price for this product/service'}">
               {{ supplier.answers[question.question] }}
             </td>
           </tr>
@@ -117,5 +117,8 @@
         </tr>
       </tbody>
     </table>
+    <div class="export-buttons">
+      <button (click)="exportPDF()">Export to PDF</button>
+    </div>
   </div>
 </div>
