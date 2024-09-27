@@ -64,3 +64,28 @@
 .export-all button:hover {
     background-color: #45a049;
 }
+
+.export-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: left;
+    margin: 20px 0;
+}
+
+.export-buttons button {
+    padding: 7.5px 15px;
+    font-size: 12px;
+    font-weight: bold;
+    background-color: #4CAF50;
+    /* A nice shade of green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.export-buttons button:hover {
+    background-color: #45a049;
+    /* A slightly darker shade for hover effect */
+}

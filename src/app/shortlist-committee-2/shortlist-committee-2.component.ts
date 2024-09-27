@@ -374,41 +374,43 @@ export class ShortlistCommittee2Component implements OnInit {
 
   private readonly COMPANIES_PER_PAGE = 3;
 
-  exportPDF(): void {
-    (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
+  exportPDF(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
-    const docDefinition = {
-      pageOrientation: 'landscape',
-      content: [
-        { text: 'Shortlist Committee Report', style: 'header' },
-        ...this.generateGeneralQuestionsTables(),
-        ...this.generateProductTables(),
-        this.generateFinalSummaryTable()
-      ],
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
+      const docDefinition = {
+        pageOrientation: 'landscape',
+        content: [
+          { text: '', style: 'header' },
+          ...this.generateGeneralQuestionsTables(),
+          ...this.generateProductTables(),
+          this.generateFinalSummaryTable()
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            margin: [0, 0, 0, 10]
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            margin: [0, 10, 0, 5]
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 13,
+            color: 'white',
+            fillColor: '#00B050'
+          }
         },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'white',
-          fillColor: '#00B050'
+        defaultStyle: {
+          fontSize: 10
         }
-      },
-      defaultStyle: {
-        fontSize: 10
-      }
-    };
+      };
 
-    pdfMake.createPdf(docDefinition).download('ShortlistCommitteeReport.pdf');
+      resolve(docDefinition);
+    });
   }
 
   private generateGeneralQuestionsTables() {

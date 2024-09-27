@@ -229,146 +229,145 @@ export class BidComparisonTableComponent implements OnInit {
     });
   }
 
+  exportPDF(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const maxCompaniesPerPage = 5;
+      const content = [];
 
-  exportPDF(): void {
-    const maxCompaniesPerPage = 5;
-    const content = [];
-
-    // Helper function to create a table
-    const createTable = (headers: string[], body: TableCell[][]): any => ({
-      table: {
-        headerRows: 1,
-        widths: ['auto', 'auto', ...headers.slice(2).map(() => 'auto')],
-        body: [headers, ...body]
-      },
-      layout: {
-        fillColor: (rowIndex: number, node: any, columnIndex: number) => {
-          if (rowIndex === 0) return '#4caf50';
-          const cellValue = node.table.body[rowIndex][columnIndex];
-          return typeof cellValue === 'object' && cellValue.fillColor ? cellValue.fillColor : null;
+      // Helper function to create a table
+      const createTable = (headers: string[], body: TableCell[][]): any => ({
+        table: {
+          headerRows: 1,
+          widths: ['auto', 'auto', ...headers.slice(2).map(() => 'auto')],
+          body: [headers, ...body]
         },
-        hLineColor: () => '#008c72',
-        vLineColor: () => '#008c72',
-        hLineWidth: () => 1,
-        vLineWidth: () => 1,
-        paddingLeft: () => 5,
-        paddingRight: () => 5,
-        paddingTop: () => 5,
-        paddingBottom: () => 5
-      }
-    });
-
-    // Helper function to paginate a single table
-    const paginateTable = (title: string, headers: string[], body: TableCell[][]): void => {
-      content.push({ text: title, style: 'subheader', margin: [0, 10, 0, 5] });
-
-      for (let i = 0; i < this.bidData.companies.length; i += maxCompaniesPerPage) {
-        if (i > 0) {
-          content.push({ text: `${title} (Continued)`, style: 'subheader', margin: [0, 10, 0, 5] });
+        layout: {
+          fillColor: (rowIndex: number, node: any, columnIndex: number) => {
+            if (rowIndex === 0) return '#4caf50';
+            const cellValue = node.table.body[rowIndex][columnIndex];
+            return typeof cellValue === 'object' && cellValue.fillColor ? cellValue.fillColor : null;
+          },
+          hLineColor: () => '#008c72',
+          vLineColor: () => '#008c72',
+          hLineWidth: () => 1,
+          vLineWidth: () => 1,
+          paddingLeft: () => 5,
+          paddingRight: () => 5,
+          paddingTop: () => 5,
+          paddingBottom: () => 5
         }
+      });
 
-        const companyGroup = this.bidData.companies.slice(i, i + maxCompaniesPerPage);
-        const paginatedHeaders = ['Section', 'Question', ...companyGroup];
-        const paginatedBody = body.map(row => [
-          row[0],
-          row[1],
-          ...row.slice(2 + i, 2 + i + maxCompaniesPerPage)
-        ]);
+      // Helper function to paginate a single table
+      const paginateTable = (title: string, headers: string[], body: TableCell[][]): void => {
+        content.push({ text: title, style: 'subheader', margin: [0, 10, 0, 5] });
 
-        content.push(createTable(paginatedHeaders, paginatedBody));
-      }
-    };
-
-    // General Questions table
-    const generalQuestionsBody = this.bidData.generalQuestions.reduce((acc, section) => {
-      return acc.concat(section.questions.map((q, index) => [
-        index === 0 ? section.name : '',
-        q.question,
-        ...q.answers
-      ]));
-    }, []);
-    paginateTable('General Questions', ['Section', 'Question', ...this.bidData.companies], generalQuestionsBody);
-
-    // Product Questions tables
-    this.bidData.productQuestions.forEach(category => {
-      const productBody = category.sections.reduce((acc, section) => {
-        return acc.concat(section.questions.map((q, index) => {
-          const row: TableCell[] = [
-            index === 0 ? section.name : '',
-            q.question,
-            ...q.answers
-          ];
-          if (section.name === 'Pricing' && q.question === 'Total price for this product/service') {
-            const lowestPrice = this.getLowestPrice(q.answers);
-            row.forEach((cell, cellIndex) => {
-              if (cellIndex >= 2 && cell === lowestPrice) {
-                row[cellIndex] = { text: cell.toString(), fillColor: '#9CFF9C' };
-              }
-            });
+        for (let i = 0; i < this.bidData.companies.length; i += maxCompaniesPerPage) {
+          if (i > 0) {
+            content.push({ text: `${title} (Continued)`, style: 'subheader', margin: [0, 10, 0, 5] });
           }
-          return row;
-        }));
-      }, [] as TableCell[][]);
-      paginateTable(category.category, ['Section', 'Question', ...this.bidData.companies], productBody);
-    });
 
-    // Total Quoted table
-    const totalQuotedBody = [['Comparison', 'Total Quoted', ...this.companyTotals]];
-    paginateTable('Comparison', ['', 'Total Quoted', ...this.bidData.companies], totalQuotedBody);
+          const companyGroup = this.bidData.companies.slice(i, i + maxCompaniesPerPage);
+          const paginatedHeaders = ['Section', 'Question', ...companyGroup];
+          const paginatedBody = body.map(row => [
+            row[0],
+            row[1],
+            ...row.slice(2 + i, 2 + i + maxCompaniesPerPage)
+          ]);
 
-    const docDefinition = {
-      pageSize: 'A4',
-      pageOrientation: 'landscape',
-      pageMargins: [40, 60, 40, 60],
-      header: {
-        columns: [
-          {
-            width: 65,
-            style: 'headerStyle'
-          }
-        ],
-        margin: [40, 20, 40, 0]
-      },
-      footer: (currentPage, pageCount) => ({
-        columns: [
-          { text: `Page ${currentPage} of ${pageCount}`, alignment: 'right', style: 'footerStyle' }
-        ]
-      }),
-      content: [
-        { text: 'Bid Comparison', style: 'header', margin: [0, 0, 0, 10] },
-        ...content
-      ],
-      styles: {
+          content.push(createTable(paginatedHeaders, paginatedBody));
+        }
+      };
+
+      // General Questions table
+      const generalQuestionsBody = this.bidData.generalQuestions.reduce((acc, section) => {
+        return acc.concat(section.questions.map((q, index) => [
+          index === 0 ? section.name : '',
+          q.question,
+          ...q.answers
+        ]));
+      }, []);
+      paginateTable('General Questions', ['Section', 'Question', ...this.bidData.companies], generalQuestionsBody);
+
+      // Product Questions tables
+      this.bidData.productQuestions.forEach(category => {
+        const productBody = category.sections.reduce((acc, section) => {
+          return acc.concat(section.questions.map((q, index) => {
+            const row: TableCell[] = [
+              index === 0 ? section.name : '',
+              q.question,
+              ...q.answers
+            ];
+            if (section.name === 'Pricing' && q.question === 'Total price for this product/service') {
+              const lowestPrice = this.getLowestPrice(q.answers);
+              row.forEach((cell, cellIndex) => {
+                if (cellIndex >= 2 && cell === lowestPrice) {
+                  row[cellIndex] = { text: cell.toString(), fillColor: '#9CFF9C' };
+                }
+              });
+            }
+            return row;
+          }));
+        }, [] as TableCell[][]);
+        paginateTable(category.category, ['Section', 'Question', ...this.bidData.companies], productBody);
+      });
+
+      // Total Quoted table
+      const totalQuotedBody = [['Comparison', 'Total Quoted', ...this.companyTotals]];
+      paginateTable('Comparison', ['', 'Total Quoted', ...this.bidData.companies], totalQuotedBody);
+
+      const docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape',
+        pageMargins: [40, 60, 40, 60],
         header: {
-          fontSize: 18,
-          bold: true,
-          color: '#4caf50'
+          columns: [
+            {
+              width: 65,
+              style: 'headerStyle'
+            }
+          ],
+          margin: [40, 20, 40, 0]
         },
-        subheader: {
-          fontSize: 14,
-          bold: true,
-          color: '#008c72'
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 12,
-          color: 'white',
-          fillColor: '#4caf50'
-        },
-        headerStyle: {
-          fontSize: 16,
-          bold: true,
-          color: '#008c72'
-        },
-        footerStyle: {
-          fontSize: 10,
-          color: '#008c72'
+        footer: (currentPage, pageCount) => ({
+          columns: [
+            { text: `Page ${currentPage} of ${pageCount}`, alignment: 'right', style: 'footerStyle' }
+          ]
+        }),
+        content: [
+          { text: 'Bid Comparison', style: 'header', margin: [0, 0, 0, 10] },
+          ...content
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            color: '#4caf50'
+          },
+          subheader: {
+            fontSize: 14,
+            bold: true,
+            color: '#008c72'
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 12,
+            color: 'white',
+            fillColor: '#4caf50'
+          },
+          headerStyle: {
+            fontSize: 16,
+            bold: true,
+            color: '#008c72'
+          },
+          footerStyle: {
+            fontSize: 10,
+            color: '#008c72'
+          }
         }
-      }
-    };
+      };
 
-    pdfMake.createPdf(docDefinition).download('BidComparison.pdf');
+      resolve(docDefinition);
+    });
   }
-
-
 }

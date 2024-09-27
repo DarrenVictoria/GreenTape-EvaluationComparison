@@ -256,41 +256,42 @@ export class AwarderComponent implements OnInit {
     }
   }
 
-  exportPDF() {
-    const docDefinition: any = {
-      content: [
-        { text: 'Awarder Report', style: 'header' },
-        ...this.getShortlistedSuppliersContent(),
-        ...this.getRejectedSuppliersContent(),
-        ...this.getLowestPriceQuotedContent(),
-        ...this.getAmendedProductQuantitiesContent()
-      ],
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
+  exportPDF(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const docDefinition: any = {
+        content: [
+          { text: '', style: 'header' },
+          ...this.getShortlistedSuppliersContent(),
+          ...this.getRejectedSuppliersContent(),
+          ...this.getLowestPriceQuotedContent(),
+          ...this.getAmendedProductQuantitiesContent()
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            margin: [0, 0, 0, 10]
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            margin: [0, 10, 0, 5]
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 13,
+            color: 'white',
+            fillColor: '#00B050'
+          }
         },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
+        defaultStyle: {
+          fontSize: 10
         },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'white',
-          fillColor: '#00B050'
-        }
-      },
-      defaultStyle: {
-        fontSize: 10
-      },
-      pageOrientation: 'landscape',
-      pageMargins: [40, 60, 40, 60]
-    };
-
-    pdfMake.createPdf(docDefinition).download('awarder-report.pdf');
+        pageOrientation: 'landscape',
+        pageMargins: [40, 60, 40, 60]
+      };
+      resolve(docDefinition);
+    });
   }
 
   private getShortlistedSuppliersContent(): any[] {
@@ -447,5 +448,7 @@ export class AwarderComponent implements OnInit {
     }
     return results;
   }
+
+
 
 }
